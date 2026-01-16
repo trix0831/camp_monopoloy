@@ -28,7 +28,7 @@ const Teams = () => {
 
   const getTeams = async () => {
     axios
-      .get("/team")
+      .get("/team") //res
       .then((res) => {
         setTeams(res.data);
       })
