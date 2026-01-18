@@ -71,7 +71,7 @@ const SetOwnership = () => {
   };
 
   useEffect(() => {
-    if (roleId < 10) {
+    if (roleId < 17) {
       navigate("/permission");
     }
     if (!prefill && prefillBuilding !== null && prefillTeams !== null) {
@@ -144,6 +144,8 @@ const SetOwnership = () => {
               <MenuItem value={1}>1</MenuItem>
               <MenuItem value={2}>2</MenuItem>
               <MenuItem value={3}>3</MenuItem>
+              <MenuItem value={4}>4</MenuItem>
+              <MenuItem value={5}>5</MenuItem>
             </Select>
             {level - buildingData.level !== 1 &&
             team !== -1 &&
@@ -162,7 +164,10 @@ const SetOwnership = () => {
             </Button> */}
             <Button
               variant="contained"
-              disabled={team === -1 || building === -1 }
+              disabled={
+                team === -1 || 
+                building === -1
+              }
               onClick={handleClick}
               fullWidth
               sx={{ marginTop: 2 }}
@@ -186,7 +191,7 @@ const SetOwnership = () => {
             </>
           ) : null}
         </Box>
-        <Snackbar open={open} onClose={handleClose} sx={{ marginBottom: 10 }}>
+        {/* <Snackbar open={open} onClose={handleClose} sx={{ marginBottom: 10 }}>
           <Alert
             onClose={handleClose}
             sx={{ width: "100%" }}
@@ -196,7 +201,7 @@ const SetOwnership = () => {
           >
             Not from Add Money!
           </Alert>
-        </Snackbar>
+        </Snackbar> */}
       </Container>
     );
   }

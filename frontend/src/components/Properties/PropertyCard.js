@@ -1,10 +1,10 @@
-import { React, useState, useContext } from "react";
+import { React, useState, useContext, useEffect, forwardRef} from "react";
 import { Grid, Paper, Typography, Modal, Box, Button } from "@mui/material";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import HouseIcon from "@mui/icons-material/House";
 import RoleContext from "../useRole";
-import axios from "axios";
+import axios from "../axios";
 
 const colors = {
   Go: "rgb(0,0,0)",
@@ -28,30 +28,46 @@ const colors = {
   Bank: "rgb(180,247,141)",
 };
 
-const PropertyCard = ({
-  id,
-  ref,
-  type,
-  area,
-  name,
-  owner,
-  hawkEye,
-  description,
-  level,
-  expanded,
-  price,
-  rent,
-  buffed,
-}) => {
+const PropertyCard = forwardRef((props, ref) => {
+
+  const {
+    id,
+    type,
+    area,
+    name,
+    owner,
+    hawkEye,
+    description,
+    level,
+    expanded,
+    price,
+    rent,
+    buffed,
+  } = props;
+
   const [open, setOpen] = useState(false);
   const [buy, setBuy] = useState(0);
   const [upgrade, setUpgrade] = useState(0);
+  const [teamName, setTeamName] = useState("");
   const { roleId } = useContext(RoleContext);
 
+  useEffect(() => {
+    if (owner && owner !== 0) {
+      axios
+        .get(`/team/${owner}`)
+        .then((res) => {
+          setTeamName(res.data.teamname);
+        })
+        .catch((error) => {
+          console.error("Error fetching team:", error);
+          setTeamName(`Team ${owner}`);
+        });
+    }
+  }, [owner]);
+
   const colorData = type === "Building" ? colors[type][area] : colors[type];
-  // console.log(ref);
   let levelIcon = [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 5; i++) {
     if (i < level) {
       levelIcon.push(<HomeRoundedIcon style={{ color: "#63f74f" }} key={i} />);
     } else {
@@ -60,39 +76,6 @@ const PropertyCard = ({
       );
     }
   }
-
-  if (hawkEye > 0 && hawkEye !== id) {
-    //affected
-    levelIcon.push(
-      <VisibilityIcon style={{ color: "rgb(225,100,100)" }} key={3} />
-    );
-  } else if (hawkEye > 0 && hawkEye === id) {
-    //self
-    levelIcon.push(<VisibilityIcon style={{ color: "#63f74f" }} key={3} />);
-  } else if (hawkEye >= 0) {
-    levelIcon.push(
-      <VisibilityIcon style={{ color: "rgb(160,160,160)" }} key={3} />
-    );
-  }
-
-  const handleBuff1 = async (name) => {
-    const payload = { name: name };
-    console.log(name);
-    await axios.post("/handleBuff1", payload);
-    handleClose();
-  };
-
-  const handleBuff2 = async (name) => {
-    const payload = { name: name };
-    console.log(2);
-    await axios.post("/handleBuff2", payload);
-  };
-
-  const handleDeBuff = async (name) => {
-    const payload = { name: name };
-    console.log(0);
-    await axios.post("/handleDeBuff", payload);
-  };
 
   const handleView = () => {
     if (type === "Building") {
@@ -156,7 +139,7 @@ const PropertyCard = ({
             {type === "Building" || type === "SpecialBuilding" ? (
               <Grid item>
                 <Typography variant="caption">
-                  {owner === 0 ? <br /> : `第${owner}小隊`}
+                  {owner === 0 ? <br /> : teamName}
                 </Typography>
               </Grid>
             ) : (
@@ -238,7 +221,7 @@ const PropertyCard = ({
               sx={{ fontWeight: 700 }}
               component="h5"
             >
-              {`地產持有人：${owner === 0 ? "無" : `第${owner}小隊`}`}
+              {`地產持有人：${owner === 0 ? "無" : teamName}`}
             </Typography>
             <Typography
               id="modal-modal-description-2"
@@ -252,67 +235,13 @@ const PropertyCard = ({
               sx={{ fontWeight: 700, fontSize: "0.9rem" }}
               component="h5"
             >
-              {`過路費： 一級 ${rent[0]} 二級 ${rent[1]} 三級 ${rent[2]} `}
-            </Typography>
-            <Typography
-              id="modal-modal-description-2"
-              sx={{ fontWeight: 700 }}
-              component="h5"
-            >
-              {`相同房產增益： ${
-                buffed === 0
-                  ? "尚未觸發"
-                  : buffed === 1
-                  ? "已觸發一級增益"
-                  : "已觸發二級增益"
-              }`}
+              {`過路費： 一星 ${rent[0]} 二星 ${rent[1]} 三星 ${rent[2]} 四星 ${rent[3]} 五星 ${rent[4]} `}
             </Typography>
           </Box>
-          {/* {roleId > 80 ? (
-            <Box
-              sx={{
-                display: "flex",
-                width: "100%",
-                height: "20%",
-                flexDirection: "row",
-                justifyContent: "space-around",
-              }}
-            >
-              <Button
-                variant="contained"
-                sx={{ marginBottom: 1, width: 80 }}
-                onClick={() => {
-                  handleBuff1(name);
-                }}
-              >
-                buff1
-              </Button>
-              <Button
-                variant="contained"
-                sx={{ marginBottom: 1, width: 80 }}
-                onClick={() => {
-                  handleBuff2(name);
-                  handleClose();
-                }}
-              >
-                buff2
-              </Button>
-              <Button
-                variant="contained"
-                sx={{ marginBottom: 1, width: 80 }}
-                onClick={() => {
-                  handleDeBuff(name);
-                  handleClose();
-                }}
-              >
-                debuff
-              </Button>
-            </Box>
-          ) : null} */}
         </Box>
       </Modal>
     </>
   );
-};
+});
 
 export default PropertyCard;

@@ -13,6 +13,7 @@ import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import SavingsIcon from '@mui/icons-material/Savings';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 export const NavBarItems = [
   {
@@ -50,53 +51,32 @@ export const NavBarItems = [
     shortLabel: "ResourcesView",
     route: "resourcesView",
   }
-  // {
-  //   id: 11,
-  //   icon: <AccountBalanceIcon />,
-  //   label: "Bank",
-  //   shortLabel: "Bank",
-  //   route: "bank",
-  // },
 ];
 
 export const NPCItems = [
   {
     id: 6,
     icon: <PaidIcon />,
-    label: "Add Money",
+    label: "Money and Property",
     shortLabel: "Money",
     route: "addmoney",
   },
   {
     id: 7,
-    icon: <RequestQuoteIcon />,
-    label: "Set Ownership",
-    shortLabel: "Ownership",
-    route: "setownership",
-  },
-  {
-    id: 8,
     icon: <CurrencyExchangeIcon />,
     label: "Transfer",
     shortLabel: "Transfer",
     route: "transfer",
   },
   {
-    id: 9,
+    id: 8,
     icon: <SavingsIcon />, 
     label: "Bank",
     shortLabel: "BankTransfer",
     route: "banktransfer",
   },
-  // {
-  //   id: 14,
-  //   icon: <QuizIcon />,
-  //   label: "Random",
-  //   shortLabel: "Random",
-  //   route: "random",
-  // },
   {
-    id: 10,
+    id: 9,
     icon: <AutoGraphIcon />, //resource
     label: "Resources",
     shortLabel: "Resources",
@@ -106,11 +86,18 @@ export const NPCItems = [
 
 export const adminItems = [
   {
-    id: 11,
+    id: 10,
     icon: <EventIcon />,
     label: "Event / Phase",
     shortLabel: "Event",
     route: "event",
+  },
+  {
+    id: 11,
+    icon: <RequestQuoteIcon />,
+    label: "Set Ownership",
+    shortLabel: "Ownership",
+    route: "setownership",
   },
   {
     id: 12,
@@ -121,44 +108,37 @@ export const adminItems = [
   },
   {
     id: 13,
+    icon: <TrendingUpIcon />,
+    label: "Loan Management",
+    shortLabel: "Loan",
+    route: "loan",
+  },
+  {
+    id: 14,
     icon: <BuildIcon />,
     label: "Team Info",
     shortLabel: "Team",
     route: "teams",
   },
   {
-    id: 14,
+    id: 15,
     icon: <PaidIcon />,
     label: "Bankrupt",
     shortLabel: "Bankrupt",
     route: "bankrupt",
   },
   {
-    id: 15,
+    id: 16,
     icon: <VolumeUpIcon />,
     label: "Broadcast",
     shortLabel: "Broadcast",
     route: "broadcast",
   },
   {
-    id: 16, 
+    id: 17, 
     icon: <CalculateIcon />,
     label: "SetResources",
     shortLabel: "SetResources",
     route: "setresources",
   }
 ];
-
-// export const Navigate = (path) => {
-//   const { setNavBarId } = useContext(RoleContext);
-//   const navigate = useNavigate();
-
-//   const itemMap = {
-//     ...NavBarItems,
-//     ...NPCItems,
-//     ...adminItems,
-//   };
-//   setNavBarId(itemMap.find((item) => item.route === path).id);
-
-//   return () => navigate(path);
-// };

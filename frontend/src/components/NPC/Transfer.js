@@ -35,18 +35,12 @@ const Transfer = () => {
   const [building, setBuilding] = useState(-1);
   const [buildingData, setBuildingData] = useState({});
 
-  const [count, setCount] = useState(-1);
-
-  const [discount, setDiscount] = useState(1);
-
   const [finalData, setFinalData] = useState({});
 
   const [amount, setAmount] = useState(0);
 
   const [errorMessage, setErrorMessage] = useState("");
-  const [errorMessage0, setErrorMessage0] = useState("");
   const [error, setError] = useState(false);
-  const [error0, setError0] = useState(false);
   const { roleId, filteredBuildings, setNavBarId } = useContext(RoleContext);
   const navigate = useNavigate();
 
@@ -56,81 +50,6 @@ const Transfer = () => {
     setFromData(data);
     setFrom(from);
   };
-
-  // const handleDiscount = async (from) => {
-  //   // const { data } = await axios.get("/team/" + from);
-  //   // // console.log(data);
-  //   // setFromData(data);
-  //   // setFrom(from);
-
-  //   // console.log(fromData.resources.love);
-
-  //   if(fromData.resources.love === 0) {
-  //     setErrorMessage("No love, No discount");
-  //   }
-  //   else if(fromData.resources.love === 1) {
-  //     setAmount(amount * 0.95);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love === 2) {
-  //     setAmount(amount * 0.925);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love === 3) {
-  //     setAmount(amount * 0.9);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love === 4) {
-  //     setAmount(amount * 0.875);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love === 5) {
-  //     setAmount(amount * 0.85);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love === 6) {
-  //     setAmount(amount * 0.835);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love === 7) {
-  //     setAmount(amount * 0.82);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love >= 8) {
-  //     setAmount(amount * 0.805);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love >= 9) {
-  //     setAmount(amount * 0.79);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love >= 10) {
-  //     setAmount(amount * 0.775);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love >= 11) {
-  //     setAmount(amount * 0.76);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love >= 12) {
-  //     setAmount(amount * 0.745);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love >= 13) {
-  //     setAmount(amount * 0.73);
-  //     setErrorMessage("Discounted");
-  //   }
-  //   else if(fromData.resources.love >= 14) {
-  //     setAmount(amount * 0.715);
-  //     setErrorMessage("Discounted");
-  //   }else if(fromData.resources.love >= 15) {
-  //     setAmount(amount * 0.7);
-  //     setErrorMessage("Discounted");
-  //   }
-
-
-  //   console.log(amount);
-  // };
 
   const handleTo = async (to, newBuildingData) => {
     const { data: toData } = await axios.get("/team/" + to);
@@ -179,13 +98,14 @@ const Transfer = () => {
     console.log("before post");
     await axios.post("/transfer", payload);
     console.log("after post");
+    
+    // Update the states with the new values from finalData
+    setFromData({ ...fromData, money: finalData.from });
+    setToData({ ...toData, money: finalData.to });
+    
     navigate("/teams");
     setNavBarId(2);
   };
-
-  const handleDiscount = () => {
-    setAmount(amount * discount);
-  }
 
   const handleBuilding = async (building) => {
     if (building > 0) {
@@ -195,24 +115,12 @@ const Transfer = () => {
       if (data.owner !== 0) {
         handleTo(data.owner, data);
       } 
-      // else if (data.hawkEye !== 0 && data.id !== data.hawkEye) {
-      //   const { data: hawkEyeTeam } = await axios.get("/team/hawkeye");
-      //   handleTo(hawkEyeTeam.id, data);
-      //   const { data: hawkEyeBuilding } = await axios.get(
-      //     "/land/" + data.hawkEye
-      //   );
-      //   setAmount(
-      //     Math.round(0.4 * hawkEyeBuilding.rent[hawkEyeBuilding.level - 1])
-      //   );
-      //   setErrorMessage("Auto Fill Hawk Eye");
-      // }
 
       const res = await axios.post("/series", {
         teamId: data.owner,
         area: data.area,
       });
       const c = res.data.count;
-      setCount(res.data.count);
 
       if (data.type === "Building") {
         if (data.level !== 0) {
@@ -227,34 +135,10 @@ const Transfer = () => {
     }
   };
 
-  // const handlePercentMoney = async (percent) => {
-  //   // const money = fromData.money; //find the team's money
-  //   const { data } = await axios.get("/getRent", {
-  //     params: { building: building },
-  //   });
-  //   setAmount(Math.round(data * (1 + percent)));
-  // };
-
-  // const handleEqualMoney = () => {
-  //   let money_from = fromData.money; //first team (using the card)
-  //   let money_to = toData.money; //second team(passive)
-  //   let temp = Math.round((money_from - money_to) / 2);
-  //   setAmount(temp);
-  // };
-
   useEffect(() => {
     if (roleId < 10) {
       navigate("/permission");
     }
-    // axios
-    //   .get("/team")
-    //   .then((res) => {
-    //     setTeams(res.data);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roleId]);
 
   useEffect(() => {
@@ -285,22 +169,27 @@ const Transfer = () => {
               <TableBody>
                 <TableRow>
                   <TableCell align="center">
-                    <HomeRoundedIcon />
+                    一星
                   </TableCell>
                   <TableCell align="center">
-                    <HomeRoundedIcon />
-                    <HomeRoundedIcon />
+                    二星
                   </TableCell>
                   <TableCell align="center">
-                    <HomeRoundedIcon />
-                    <HomeRoundedIcon />
-                    <HomeRoundedIcon />
+                    三星
+                  </TableCell>
+                  <TableCell align="center">
+                    四星
+                  </TableCell>
+                  <TableCell align="center">
+                    五星
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell align="center">{buildingData.rent[0]}</TableCell>
                   <TableCell align="center">{buildingData.rent[1]}</TableCell>
                   <TableCell align="center">{buildingData.rent[2]}</TableCell>
+                  <TableCell align="center">{buildingData.rent[3]}</TableCell>
+                  <TableCell align="center">{buildingData.rent[4]}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -509,7 +398,6 @@ const Transfer = () => {
               disabled={amount === 0 || discount === 1}
               onClick={handleDiscount}
               fullWidth
-              fullHeight
               sx={{ marginLeft: 1 }}
             >
               discount

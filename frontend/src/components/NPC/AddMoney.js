@@ -30,9 +30,6 @@ const AddMoney = () => {
   const [team, setTeam] = useState(-1);
   const [teamData, setTeamData] = useState({});
   const [newData, setNewData] = useState(0);
-  const [jeff, setJeff] = useState(false);
-  const [jeffTeam, setJeffTeam] = useState(-1);
-  const [checkMessage, setCheckMessage] = useState("");
 
   const [amount, setAmount] = useState("0");
   const [errorMessage, setErrorMessage] = useState("");
@@ -62,11 +59,7 @@ const AddMoney = () => {
 
   const checkPropertyCost = async (mode) => {
     const payload = { team: team, building: building, mode: mode };
-    const {
-      data: { message },
-    } = await axios.post("/checkPropertyCost", payload);
-    console.log(message);
-    setCheckMessage(message);
+    await axios.post("/checkPropertyCost", payload);
   };
 
   const handleAmount = async (amount) => {
@@ -78,72 +71,20 @@ const AddMoney = () => {
     setAmount(amount);
   };
 
+  const handleDiscount = () => {
+    setAmount(parseInt(amount) * discount);
+  };
+
   const handleBuilding = async (building) => {
     if (building > 0) {
       const { data } = await axios.get("/land/" + building);
       setBuilding(building);
-      setPrice(data.price);
+      setPrice({ ...data.price, level: data.level, owner: data.owner });
     } else {
       setBuilding(-1);
       setPrice({});
     }
     // console.log(data);
-  };
-
-  const handleJeff = async () => {
-    const { data } = await axios.get("/teamRich");
-    console.log(data);
-    setJeff(true);
-    setJeffTeam(data.id);
-    handleAmount(Math.round(data.money * 0.25));
-  };
-
-  const handleDiscount = () => {
-    setAmount(amount * discount);
-  }
-
-  const handleCard = async (number) => {
-    if (number === 0) {
-      // 小隊現金*1.5，最多30000
-      setAmount(teamData.money * 0.5 > 30000 ? 30000 : teamData.money * 0.5);
-    } else if (number === 1) {
-      // 強制拍賣地產，賣得的錢七三分，地主七
-      const payload = { building: building };
-      const { data } = await axios.post("/goldenFruit", payload);
-      console.log(data);
-      handleAmount(
-        Math.round(
-          (data.land[0].price.buy +
-            data.land[0].price.upgrade * (data.level - 1)) *
-            0.03
-        ) * 10
-      );
-      navigate("/teams");
-      setNavBarId(2);
-    } else if (number === 2) {
-      // 全部損失5000
-      await axios.post("/tape");
-      navigate("/teams");
-      setNavBarId(2);
-    } else if (number === 3) {
-      // 搶走錢最後一名的隨機一棟房子
-      const payload = { id: team };
-      const { data } = await axios.post("/rob", payload);
-      console.log(data);
-      if (data.building) navigate("/properties?id=" + data.building);
-      else navigate("/properties");
-      setNavBarId(3);
-    } else if (number === 4) {
-      // 與金錢榜前一名小隊平分金錢
-      const payload = { id: team };
-      await axios.post("/equility", payload);
-      navigate("/teams");
-      setNavBarId(2);
-    }
-  };
-
-  const handlePercentMoney = async (percent) => {
-    handleAmount(Math.round(amount * (1 + percent)));
   };
 
   const handlePreview = async () => {
@@ -156,13 +97,9 @@ const AddMoney = () => {
   const handleSubmit = async () => {
     const payload = {
       id: team,
-      teamname: `第${team}小隊`,
-      dollar: parseInt(amount) ? parseInt(amount) : 0,
-      jeff: jeff,
-      jeffTeam: jeffTeam,
+      dollar: parseInt(amount) ? parseInt(amount) : 0
     };
     await axios.post("/add", payload);
-    setJeff(false);
     navigate("/teams");
     setNavBarId(2);
   };
@@ -199,7 +136,7 @@ const AddMoney = () => {
   };
 
   useEffect(() => {
-    if (roleId < 10) {
+    if (roleId < 17) {
       navigate("/permission");
       setNavBarId(0);
     }
@@ -310,10 +247,11 @@ const AddMoney = () => {
             </Button>
             <Button
               variant="contained"
-              disabled={team === -1 || !price.upgrade}
+              disabled={team === -1 || !price.upgrade || price.level >= price.upgrade.length}
               sx={{ marginBottom: 1, width: 120 }}
               onClick={() => {
-                handleAmount(-1 * price.upgrade);
+                const cost = price.upgrade[price.level - 1];
+                handleAmount(-1 * cost);
                 checkPropertyCost("Upgrade");
               }}
             >
@@ -321,7 +259,7 @@ const AddMoney = () => {
             </Button>
           </Box>
 
-          <Box
+          {/* <Box
             sx={{
               display: "flex",
               flexDirection: "row",
@@ -357,12 +295,11 @@ const AddMoney = () => {
               disabled={amount === 0 || discount === 1}
               onClick={handleDiscount}
               fullWidth
-              fullHeight
               sx={{ marginLeft: 1 }}
             >
               Calculate
             </Button>
-          </Box>
+          </Box> */}
 
           {/* <Box
             sx={{
@@ -461,17 +398,23 @@ const AddMoney = () => {
             <Table aria-label="simple table" size="small">
               <TableBody>
                 <TableRow>
-                  <TableCell align="left">Buy</TableCell>
+                  <TableCell align="left">Owner</TableCell>
                   <TableCell align="right">
-                    {price.buy !== null ? price.buy : ""}
+                    {price.owner && price.owner !== 0 ? `Team ${price.owner}` : "Not Owned"}
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell align="left">Upgrade</TableCell>
+                  <TableCell align="left">Buy (★)</TableCell>
                   <TableCell align="right">
-                    {(price.upgrade !== null) !== 0 ? price.upgrade : ""}
+                    {price.buy !== null && price.buy !== undefined ? price.buy : ""}
                   </TableCell>
                 </TableRow>
+                {price.upgrade && price.upgrade.map((upgradeCost, index) => (
+                  <TableRow key={index}>
+                    <TableCell align="left">Upgrade {index + 1} (★{index + 2})</TableCell>
+                    <TableCell align="right">{upgradeCost}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>

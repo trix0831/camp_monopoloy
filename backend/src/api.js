@@ -154,50 +154,9 @@ router.get("/", (req, res) => {
   res.json({ a: 1, b: 2 });
 });
 
-// const requireAdmin = (req, res, next) => {
-//   if (!req.session.user) {
-//     res.status(401).json({ error: "Unauthorized" });
-//     return;
-//   }
-//   if (req.session.user.username !== "admin") {
-//     res.status(403).json({ error: "Forbidden" });
-//     return;
-//   }
-//   next();
-// };
-
-// const requireNPC = (req, res, next) => {
-//   if (!req.session.user) {
-//     res.status(401).json({ error: "Unauthorized" });
-//     return;
-//   }
-//   next();
-// };
-
-// async function calcmoney(teamname, money, estate) {
-//   const team = await Team.findOne({ teamname });
-//   if (money > 0) {
-//     if (team.soulgem.value) {
-//       money *= 2;
-//     }
-//     if (estate) {
-//       money *= team.bonus.value;
-//     }
-//   } else {
-//     if (team.soulgem.value) {
-//       money *= 1.5;
-//     }
-//   }
-//   return money;
-// }
-
 async function updateTeam(team, moneyChanged, io, saved) {
   const teamObj = await Team.findOne({ id: team });
   var ratio = 1;
-  if (teamObj.soulgem.value === true) {
-    if (moneyChanged > 0) ratio = 2;
-    else ratio = 1.5;
-  }
   let final = Math.round(teamObj.money + moneyChanged * ratio);
   if (saved && final < 0) {
     const message = {
@@ -233,23 +192,6 @@ async function deleteTimeoutNotification() {
     }
   }
 }
-
-// router
-//   .get("/phase", async (req, res) => {
-//     const phase = await Pair.findOne({ key: "phase" });
-//     res.json({ phase: phase.value }).status(200);
-//   })
-//   .post("/phase", async (req, res) => {
-//     const phase = await Pair.findOne({ key: "phase" });
-//     phase.value = req.body.phase;
-//     await phase.save();
-//     res.json({ phase: phase.value }).status(200);
-//     req.io.emit("broadcast", {
-//       title: `Phase Changed to ${phase.value}`,
-//       description: "",
-//       level: 0,
-//     });
-//   });
 
 router.get("/team", async (req, res) => {
   const teams = await Team.find().sort({ teamname: 1 });
@@ -858,33 +800,15 @@ router.post("/goldenFruit", async (req, res) => {
 
 router
   .post("/add", async (req, res) => {
-    const { id, dollar, jeff, jeffTeam } = req.body;
+    const { id, dollar } = req.body;
     const team = await Team.findAndCheckValid(id);
-    const targetTeam = await Team.find({ id: jeffTeam });
     if (!team) {
       res.status(403).send();
       console.log("Team not found");
       return;
     }
 
-    if (jeff) {
-      req.io.emit("broadcast", {
-        title: "劫富卡發動",
-        description: `第${jeffTeam}小隊遭到劫富！！`,
-      });
-      await Team.findOneAndUpdate(
-        { id: jeffTeam },
-        { money: targetTeam[0].money * 0.75 }
-      );
-    }
-
     await updateTeam(id, dollar, req.io, true);
-    // if (dollar < 0) {
-    //   req.io.emit("broadcast", {
-    //     title: "扣錢",
-    //     description: `第${id}小隊遭扣除${-dollar}元！！`,
-    //   });
-    // }
 
     res.status(200).send("Update succeeded");
   })
@@ -1053,18 +977,9 @@ const calcTransfer = async (from, to, amount, isEstate) => {
   var FromAmount = parseInt(FromTeam.money);
   var ToAmount = parseInt(ToTeam.money);
   var TransferAmount = parseInt(amount);
-  console.log(TransferAmount, ToTeam.bonus.value);
-  if (isEstate && ToTeam.bonus.value !== 0)
-    TransferAmount *= ToTeam.bonus.value;
-
-  console.log(TransferAmount);
-  if (FromTeam.soulgem.value)
-    FromAmount -= parseInt(Math.round(TransferAmount * 1.5));
-  else FromAmount -= TransferAmount;
-
-  if (ToTeam.soulgem.value)
-    ToAmount += parseInt(Math.round(TransferAmount * 2));
-  else ToAmount += TransferAmount;
+  
+  ToAmount += TransferAmount;
+  FromAmount -= TransferAmount;
   console.log({ from: FromAmount, to: ToAmount });
   return { from: FromAmount, to: ToAmount };
 };
@@ -1361,6 +1276,15 @@ router.post("/login", async (req, res) => {
 
 router.get("/room", async (req, res) => {
   res.status(200).send(req.io.room);
+});
+
+router.post("/loan", async (req, res) => {
+  const { id, loan } = req.body;
+  const team = await Team.find({ id: id });
+  team[0].money += loan;
+  team[0].loan += loan;
+  await team[0].save();
+  res.json("Success").status(200);
 });
 
 // router.post("/logout", async (req, res) => {
