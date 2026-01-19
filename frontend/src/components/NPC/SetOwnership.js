@@ -55,11 +55,6 @@ const SetOwnership = () => {
     const { data } = await axios.get("/land/" + building);
     setBuilding(building);
     setBuildingData(data);
-    if (data.type === "Building") {
-      setLevel(data.level + 1);
-    } else {
-      setLevel(0);
-    }
   };
 
   const handleClose = (e, reason) => {
@@ -140,20 +135,21 @@ const SetOwnership = () => {
               }}
             >
               {/* <MenuItem value={0}>0</MenuItem> */}
+              <MenuItem value={0}>0 (not owned)</MenuItem>
               <MenuItem value={1}>1</MenuItem>
               <MenuItem value={2}>2</MenuItem>
               <MenuItem value={3}>3</MenuItem>
               <MenuItem value={4}>4</MenuItem>
               <MenuItem value={5}>5</MenuItem>
             </Select>
-            {level - buildingData.level !== 1 &&
+            {/* {level - buildingData.level !== 1 &&
             team !== -1 &&
             buildingData.type === "Building" &&
             building !== -1 ? (
               <FormHelperText error={true}>
                 Not Upgrading 1 level!!!
               </FormHelperText>
-            ) : null}
+            ) : null} */}
             {/* <Button
               disabled={team === -1 || building === -1}
               onClick={handleClick}

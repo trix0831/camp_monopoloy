@@ -985,14 +985,53 @@ router.get("/transfer", async (req, res) => {
 //   console.log("hawkEye updated");
 // }
 
+// Helper function to calculate net value based on level
+const calculateNetValue = (buyPrice, upgradePrices, level) => {
+  if (level === 0) return 0;
+  let total = buyPrice; // Level 1 costs buyPrice
+  for (let i = 1; i < level; i++) {
+    total += upgradePrices[i - 1]; // Level i+1 costs upgradePrices[i-1]
+  }
+  return total;
+};
+
 router.post("/ownership", async (req, res) => {
   const { teamId, land, level } = req.body;
-  const tmp1 = await Land.findOneAndUpdate({ name: land }, { owner: teamId });
-  if (!tmp1) {
+  
+  // Get the current land state before updating
+  const currentLand = await Land.findOne({ name: land });
+  if (!currentLand) {
     res.status(403).send();
-    console.log("Update failed");
+    console.log("Land not found");
     return;
   }
+
+  const oldOwner = currentLand.owner;
+  const oldLevel = currentLand.level;
+  const buyPrice = currentLand.price.buy;
+  const upgradePrices = currentLand.price.upgrade;
+
+  // Calculate net values based on actual level costs
+  const oldNetValue = calculateNetValue(buyPrice, upgradePrices, oldLevel);
+  const newNetValue = calculateNetValue(buyPrice, upgradePrices, level);
+
+  if (level > 0) {
+    const tmp1 = await Land.findOneAndUpdate({ name: land }, { owner: teamId });
+    if (!tmp1) {
+      res.status(403).send();
+      console.log("Update failed");
+      return;
+    }
+  }else{
+    const tmp1 = await Land.findOneAndUpdate({ name: land }, { owner: 0 });
+    if (!tmp1) {
+      res.status(403).send();
+      console.log("Update failed");
+      return;
+    }
+  }
+
+
   const tmp2 = await Land.findOneAndUpdate({ name: land }, { level: level });
   if (!tmp2) {
     res.status(403).send();
@@ -1000,7 +1039,35 @@ router.post("/ownership", async (req, res) => {
     return;
   }
 
-  // await updateHawkEye(land);
+  // Handle the net value problem
+  if (oldOwner !== teamId) {
+    // Different owner: remove old net value from old owner, add new net value to new owner
+    if (oldOwner !== 0) { // 0 means NPC/no owner
+      const oldOwnerTeam = await Team.findOne({ id: oldOwner });
+      if (oldOwnerTeam) {
+        oldOwnerTeam.propertyValue -= oldNetValue;
+        await oldOwnerTeam.save();
+      }
+    }
+
+    // Only add new net value if property is not removed (level > 0)
+    if (level > 0) {
+      const newOwnerTeam = await Team.findOne({ id: teamId });
+      if (newOwnerTeam) {
+        newOwnerTeam.propertyValue += newNetValue;
+        await newOwnerTeam.save();
+      }
+    }
+  } else {
+    // Same owner: adjust net value based on level change
+    const ownerTeam = await Team.findOne({ id: teamId });
+    if (ownerTeam) {
+      const netValueDifference = newNetValue - oldNetValue;
+      ownerTeam.propertyValue += netValueDifference;
+      await ownerTeam.save();
+    }
+  }
+
   res.status(200).send("update succeeded");
 });
 
@@ -1264,6 +1331,8 @@ router.post("/transferLand", async (req, res) => {
     sellerTeam.money += amount;
     land.owner = buyerTeamId;
     // Level stays the same (no modification needed)
+    buyerTeam.propertyValue += amount/4;
+    sellerTeam.propertyValue -= amount/4;
 
     // Save changes
     await buyerTeam.save();
