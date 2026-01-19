@@ -40,6 +40,7 @@ const AddMoney = () => {
 
   const [building, setBuilding] = useState(-1);
   const [price, setPrice] = useState({});
+  const [ownerTeamName, setOwnerTeamName] = useState("");
 
   const [showPreview, setShowPreview] = useState(false);
   const { roleId, filteredBuildings, setNavBarId } = useContext(RoleContext);
@@ -51,10 +52,13 @@ const AddMoney = () => {
     } else {
       setShowPreview(false);
     }
-    const { data } = await axios.get("/team/" + team);
-    // console.log(data);
-    setTeamData(data);
-    setTeam(team);
+    if (team !== -1) {
+      const { data } = await axios.get("/team/" + team);
+      // console.log(data);
+      setTeamData(data);
+      setTeam(team);
+    }
+    
   };
 
   const checkPropertyCost = async (mode) => {
@@ -80,11 +84,36 @@ const AddMoney = () => {
       const { data } = await axios.get("/land/" + building);
       setBuilding(building);
       setPrice({ ...data.price, level: data.level, owner: data.owner });
+      
+      // Fetch owner team name if land has an owner
+      if (data.owner !== 0 && data.owner !== undefined && data.owner !== -1) {
+        const { data: ownerData } = await axios.get("/team/" + data.owner);
+        setOwnerTeamName(ownerData.teamname);
+      } else {
+        setOwnerTeamName("");
+      }
+      
+      // Auto-set amount based on land ownership status
+      if (data.owner === 0) {
+        // No owner, use buy price
+        setAmount(data.price.buy.toString());
+      } else if (data.owner === team) {
+        // Owned by this team, use upgrade price
+        if (data.level < data.price.upgrade.length) {
+          setAmount(data.price.upgrade[data.level - 1].toString());
+        } else {
+          setAmount("0");
+        }
+      } else {
+        // Owned by another team, disable button
+        setAmount("0");
+      }
     } else {
       setBuilding(-1);
       setPrice({});
+      setOwnerTeamName("");
+      setAmount("0");
     }
-    // console.log(data);
   };
 
   const handlePreview = async () => {
@@ -107,11 +136,15 @@ const AddMoney = () => {
   const handleSubmitAndSetOwnership = async () => {
     const payload = {
       id: team,
-      teamname: `第${team}小隊`,
-      dollar: parseInt(amount) ? parseInt(amount) : 0,
+      dollar: parseInt(amount*-1) ? parseInt(amount*-1) : 0,
     };
     await axios.post("/add", payload);
-    navigate("/setownership?id=" + building + "&team=" + team);
+
+    const landpayload = { teamId: team, landId: building, moneyPaid: parseInt(amount) ? parseInt(amount) : 0 };
+    await axios.post("/npcOwnership", landpayload);
+
+    navigate("/properties?id=" + building);
+
     setNavBarId(6);
   };
 
@@ -212,9 +245,9 @@ const AddMoney = () => {
               justifyContent: "space-between",
             }}
           >
-            <SimpleMoneyButton val={+4000} />
-            <SimpleMoneyButton val={+10000} />
-            <SimpleMoneyButton val={+16000} />
+            <SimpleMoneyButton val={-200} />
+            <SimpleMoneyButton val={-400} />
+            <SimpleMoneyButton val={-500} />
           </Box>
           <Box
             sx={{
@@ -223,122 +256,17 @@ const AddMoney = () => {
               justifyContent: "space-between",
             }}
           >
-            <SimpleMoneyButton val={+2000} />
-            <SimpleMoneyButton val={+3000} />
-            <SimpleMoneyButton val={+5000} />
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Button
-              variant="contained"
-              disabled={team === -1 || !price.buy}
-              sx={{ marginBottom: 1, width: 120 }}
-              onClick={() => {
-                handleAmount(-1 * price.buy);
-                checkPropertyCost("Buy");
-              }}
-            >
-              Buy
-            </Button>
-            <Button
-              variant="contained"
-              disabled={team === -1 || !price.upgrade || price.level >= price.upgrade.length}
-              sx={{ marginBottom: 1, width: 120 }}
-              onClick={() => {
-                const cost = price.upgrade[price.level - 1];
-                handleAmount(-1 * cost);
-                checkPropertyCost("Upgrade");
-              }}
-            >
-              Upgrade
-            </Button>
+            <SimpleMoneyButton val={+200} />
+            <SimpleMoneyButton val={+400} />
+            <SimpleMoneyButton val={+500} />
           </Box>
 
-          {/* <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: 1,
-              marginBottom: 1,
-              width: "100%",
-            }}
-          >
-            <TextField
-              required
-              error={error0}
-              label="discount"
-              id="discount"
-              value={discount}
-              onChange={(e) => {
-                const re = /^\d*\.?\d*$/;
-                if (e.target.value === "" || re.test(e.target.value)) {
-                  setDiscount(e.target.value ? e.target.value : "");
-                  setErrorMessage0("");
-                  setError0(false);
-                } else {
-                  setErrorMessage0("Please enter a valid number");
-                  setError0(true);
-                }
-              }}
-              helperText={errorMessage0}
-              FormHelperTextProps={{ error: true }}
-            />
-
-            <Button
-              variant="contained"
-              disabled={amount === 0 || discount === 1}
-              onClick={handleDiscount}
-              fullWidth
-              sx={{ marginLeft: 1 }}
-            >
-              Calculate
-            </Button>
-          </Box> */}
-
-          {/* <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Button
-              variant="contained"
-              disabled={team === -1 || amount === 0}
-              sx={{ marginBottom: 1, width: 80 }}
-              onClick={() => handlePercentMoney(-0.2)}
-            >
-              -20%
-            </Button>
-            <Button
-              variant="contained"
-              disabled={team === -1 || amount === 0}
-              sx={{ marginBottom: 1, width: 80 }}
-              onClick={() => handlePercentMoney(0.5)}
-            >
-              +50%
-            </Button>
-            <Button
-              variant="contained"
-              disabled={team === -1 || amount === 0}
-              sx={{ marginBottom: 1, width: 80 }}
-              onClick={() => handlePercentMoney(1)}
-            >
-              +100%
-            </Button>
-          </Box> */}
           <Grid container spacing={1}>
             <Grid item xs={6}>
               <Box display="flex" flexDirection="row" justifyContent="center">
                 <Button
                   variant="contained"
-                  disabled={team === -1 || amount === ""}
+                  disabled={team === -1 || amount === "" || building !== -1}
                   onClick={handleSubmit}
                   fullWidth
                 >
@@ -353,7 +281,8 @@ const AddMoney = () => {
                   disabled={
                     team === -1 ||
                     amount === "0" ||
-                    building === -1 
+                    building === -1 ||
+                    (price.owner !== 0 && price.owner !== team)
                   }
                   onClick={handleSubmitAndSetOwnership}
                   fullWidth
@@ -400,7 +329,13 @@ const AddMoney = () => {
                 <TableRow>
                   <TableCell align="left">Owner</TableCell>
                   <TableCell align="right">
-                    {price.owner && price.owner !== 0 ? `Team ${price.owner}` : "Not Owned"}
+                    {price.owner && price.owner !== 0 ? ownerTeamName : "Not Owned"}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell align="left">Level</TableCell>
+                  <TableCell align="right">
+                    {price.level !== undefined ? price.level : ""}
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -418,6 +353,34 @@ const AddMoney = () => {
               </TableBody>
             </Table>
           </TableContainer>
+
+          {building > 0 && (
+            <Box
+              sx={{ marginTop: 2 }}
+              justifyContent="center"
+              alignItems="center"
+              display="flex"
+              flexDirection="column"
+            >
+              <Typography component="h1" variant="h6" sx={{ marginBottom: 1 }}>
+                Action and Cost
+              </Typography>
+              
+              {price.owner === 0 && (
+                <Typography component="h2" variant="body2" sx={{ marginBottom: 0 }}>
+                  Action: Buy
+                </Typography>
+              )}
+              {price.owner === team && (
+                <Typography component="h2" variant="body2" sx={{ marginBottom: 0 }}>
+                  Action: Upgrade
+                </Typography>
+              )}
+              <Typography component="h2" variant="body2" sx={{ marginBottom: 0.5 }}>
+                Cost: {amount}
+              </Typography>
+            </Box>
+          )}
         </Box>
 
         {showPreview ? (
@@ -432,7 +395,7 @@ const AddMoney = () => {
               Preview
             </Typography>
             <Typography component="h2" variant="body2" sx={{ marginBottom: 1 }}>
-              {teamData.money} &gt;&gt; {newData}
+              {teamData.teamname}: {teamData.money} &gt;&gt; {newData}
             </Typography>
           </Box>
         ) : null}

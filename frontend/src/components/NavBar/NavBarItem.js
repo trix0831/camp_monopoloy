@@ -14,6 +14,7 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import SavingsIcon from '@mui/icons-material/Savings';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
 export const NavBarItems = [
   {
@@ -37,20 +38,20 @@ export const NavBarItems = [
     shortLabel: "Properties",
     route: "properties",
   },
-  {
-    id: 4,
-    icon: <MapIcon />,
-    label: "Game Map",
-    shortLabel: "Map",
-    route: "map",
-  },
-  {
-    id: 5,
-    icon: <AutoGraphIcon />, //resource
-    label: "ResourcesView",
-    shortLabel: "ResourcesView",
-    route: "resourcesView",
-  }
+  // {
+  //   id: 4,
+  //   icon: <MapIcon />,
+  //   label: "Game Map",
+  //   shortLabel: "Map",
+  //   route: "map",
+  // },
+  // {
+  //   id: 5,
+  //   icon: <AutoGraphIcon />, //resource
+  //   label: "ResourcesView",
+  //   shortLabel: "ResourcesView",
+  //   route: "resourcesView",
+  // }
 ];
 
 export const NPCItems = [
@@ -64,23 +65,23 @@ export const NPCItems = [
   {
     id: 7,
     icon: <CurrencyExchangeIcon />,
-    label: "Transfer",
+    label: "Toll",
     shortLabel: "Transfer",
     route: "transfer",
   },
-  {
-    id: 8,
-    icon: <SavingsIcon />, 
-    label: "Bank",
-    shortLabel: "BankTransfer",
-    route: "banktransfer",
-  },
+  // {
+  //   id: 9,
+  //   icon: <AutoGraphIcon />, //resource
+  //   label: "Resources",
+  //   shortLabel: "Resources",
+  //   route: "resources",
+  // }
   {
     id: 9,
-    icon: <AutoGraphIcon />, //resource
-    label: "Resources",
-    shortLabel: "Resources",
-    route: "resources",
+    icon: <SwapHorizIcon />,
+    label: "Transfer Land",
+    shortLabel: "TransferLand",
+    route: "transferland",
   }
 ];
 
@@ -88,7 +89,7 @@ export const adminItems = [
   {
     id: 10,
     icon: <EventIcon />,
-    label: "Event / Phase",
+    label: "Reset",
     shortLabel: "Event",
     route: "event",
   },
@@ -99,13 +100,13 @@ export const adminItems = [
     shortLabel: "Ownership",
     route: "setownership",
   },
-  {
-    id: 12,
-    icon: <LocalAtmIcon />,
-    label: "Interest",
-    shortLabel: "Interest",
-    route: "interest",
-  },
+  // {
+  //   id: 12,
+  //   icon: <LocalAtmIcon />,
+  //   label: "Interest",
+  //   shortLabel: "Interest",
+  //   route: "interest",
+  // },
   {
     id: 13,
     icon: <TrendingUpIcon />,
@@ -113,20 +114,13 @@ export const adminItems = [
     shortLabel: "Loan",
     route: "loan",
   },
-  {
-    id: 14,
-    icon: <BuildIcon />,
-    label: "Team Info",
-    shortLabel: "Team",
-    route: "teams",
-  },
-  {
-    id: 15,
-    icon: <PaidIcon />,
-    label: "Bankrupt",
-    shortLabel: "Bankrupt",
-    route: "bankrupt",
-  },
+  // {
+  //   id: 15,
+  //   icon: <PaidIcon />,
+  //   label: "Bankrupt",
+  //   shortLabel: "Bankrupt",
+  //   route: "bankrupt",
+  // },
   {
     id: 16,
     icon: <VolumeUpIcon />,
@@ -134,11 +128,11 @@ export const adminItems = [
     shortLabel: "Broadcast",
     route: "broadcast",
   },
-  {
-    id: 17, 
-    icon: <CalculateIcon />,
-    label: "SetResources",
-    shortLabel: "SetResources",
-    route: "setresources",
-  }
+  // {
+  //   id: 17, 
+  //   icon: <CalculateIcon />,
+  //   label: "SetResources",
+  //   shortLabel: "SetResources",
+  //   route: "setresources",
+  // },
 ];

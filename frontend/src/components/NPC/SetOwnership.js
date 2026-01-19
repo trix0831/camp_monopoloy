@@ -42,7 +42,6 @@ const SetOwnership = () => {
     await axios.post("/ownership", payload);
     navigate("/properties?id=" + buildingData.id);
     setNavBarId(3);
-    await axios.post("/calcbonus", payload);
   };
 
   const handleTeam = (team) => {

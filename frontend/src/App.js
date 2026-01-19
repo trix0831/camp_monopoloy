@@ -13,6 +13,7 @@ import Login from "./components/Login";
 import AddMoney from "./components/NPC/AddMoney";
 import SetOwnership from "./components/NPC/SetOwnership";
 import Transfer from "./components/NPC/Transfer";
+import TransferLand from "./components/NPC/TransferLand";
 import SetShopLevel from "./components/NPC/SetShopLevel";
 import Support from "./components/NPC/Support";
 import Event from "./components/admin/Event";
@@ -101,6 +102,7 @@ const App = () => {
               <Route path="addmoney" element={<AddMoney />} />
               <Route path="setownership" element={<SetOwnership />} />
               <Route path="transfer" element={<Transfer />} />
+              <Route path="transferland" element={<TransferLand />} />
               <Route path="banktransfer" element={<BankTransfer />} />
               <Route path="setshop" element={<SetShopLevel />} />
               <Route path="random" element={<Random />} />

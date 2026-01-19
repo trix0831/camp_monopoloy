@@ -1,33 +1,28 @@
-FROM node:14.17-alpine
+# Use Node.js base image
+FROM node:18-alpine
+
+# Set working directory
 WORKDIR /app
 
-# Install app dependencies
-COPY ./backend ./backend
-COPY ./frontend/build ./frontend/build
-COPY ./index.js ./index.js
-COPY package*.json ./
-COPY backend/package*.json ./backend/
-RUN yarn install-backend
+# --- FRONTEND BUILD ---
+# Copy and build the frontend
+COPY frontend ./frontend
+WORKDIR /app/frontend
+RUN yarn install && yarn build
 
-# Bundle app source
-ENV NODE_ENV=production
-ARG MONGO_URL
-ENV MONGO_URL=${MONGO_URL:-}
-ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=${REACT_APP_API_URL:-}
+# --- BACKEND SETUP ---
+WORKDIR /app
+COPY backend ./backend
 
-EXPOSE 2022
-CMD [ "node", "index.js" ]
+# Copy frontend build output into backend folder to serve it
+RUN cp -r ./frontend/build ./backend/frontend_build
 
-# FROM node:16-alpine
+# Set backend workdir and install dependencies
+WORKDIR /app/backend
+RUN yarn install
 
-# EXPOSE 2023
+# Expose backend port
+EXPOSE 4000
 
-# COPY . /app
-# WORKDIR /app
-
-# RUN corepack enable
-# RUN yarn install:prod
-# RUN yarn build-frontend
-
-# CMD ["yarn", "deploy"]
+# Start backend
+CMD ["yarn", "server"]

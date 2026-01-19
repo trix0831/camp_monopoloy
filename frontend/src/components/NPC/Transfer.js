@@ -259,7 +259,7 @@ const Transfer = () => {
         }}
       >
         <Typography component="h1" variant="h5">
-          Transfer Money
+          Toll Transfer
         </Typography>
         <FormControl variant="standard" sx={{ minWidth: 250, marginTop: 0 }}>
           <InputLabel id="building">Building</InputLabel>

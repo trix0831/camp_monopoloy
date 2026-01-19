@@ -14,7 +14,7 @@ services:
       - monopoly-mongodb
     environment:
       MONGO_URL: mongodb://monopoly-mongodb/monopoly
-      WEB_DOMAIN: eecamp-monopoly.ntuee.org
+      WEB_DOMAIN: sunbank-v1-1054651216998.asia-east1.run.app
     tty: true
     stdin_open: true
     networks:

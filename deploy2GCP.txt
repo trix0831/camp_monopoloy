@@ -1,0 +1,3 @@
+docker build . -t sunbank
+docker tag sunbank asia-east1-docker.pkg.dev/first-planet-484715-k1/sunbank/sunbank-v1
+docker push asia-east1-docker.pkg.dev/first-planet-484715-k1/sunbank/sunbank-v1

@@ -76,6 +76,22 @@ const users = [
     username: "6B",
     password: "password",
   },
+  {
+    username: "7A",
+    password: "hungryasfuck",
+  },
+  {
+    username: "7B",
+    password: "iwanttorun",
+  },
+  {
+    username: "8A",
+    password: "letmego",
+  },
+  {
+    username: "8B",
+    password: "trix",
+  },
 ];
 
 const teams = [

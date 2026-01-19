@@ -7,6 +7,7 @@ import express from "express";
 import dotenv from "dotenv-defaults";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 // import redis from "ioredis";
 // import connectRedis from "connect-redis";
 // import { v4 as uuid_v4 } from "uuid";
@@ -17,6 +18,9 @@ import apiRouter from "./api.js";
 import socket from "./socket.js";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const db = mongoose.connection;
 
@@ -124,7 +128,7 @@ db.once("open", () => {
   app.use(cors());
   // app.use(sessionMiddleware);
   app.use(morgan("dev"));
-  // app.use(express.static(path.join(process.cwd(), "build")));
+  app.use(express.static(path.join(__dirname, "../frontend_build")));
   app.use(function (request, response, next) {
     request.io = io;
     next();
@@ -132,9 +136,10 @@ db.once("open", () => {
 
   app.use("/api", apiRouter);
 
-  // app.get("/*", (req, res) => {
-  //   res.sendFile(path.join(process.cwd(), "build", "index.html"));
-  // });
+  // Serve index.html for client-side routing
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend_build", "index.html"));
+  });
 
   socket(io);
 

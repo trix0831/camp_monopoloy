@@ -471,13 +471,12 @@ router.post("/reset", async(req, res) =>{
   const resources = await Resource.find();
 
   for(let i = 0; i < teams.length; i++) {
-    teams[i].money = 40000;
-    teams[i].bank = 0;
-    teams[i].resources.eecoin = 0;
+    teams[i].money = 8000;
+    teams[i].loan = 0;
+    teams[i].propertyValue = 0;
     await teams[i].save();
   }
 
-  resources[0].price = 10000;
 
   const lands = await Land.find();
   //set all lands to 0
@@ -742,62 +741,6 @@ router
     res.json(event).status(200);
   });
 
-// router.post("/occupation", async (req, res) => {
-//   const { teamname, occupation } = req.body;
-//   const team = await Team.findOne({ teamname });
-//   team.occupation = occupation;
-//   await team.save();
-
-//   if (occupation === "鷹眼") {
-//     const pair = await Pair.findOneAndUpdate(
-//       { key: "hawkEyeTeam" },
-//       { value: team.id }
-//     );
-//   }
-//   res.json(team).status(200);
-// });
-
-// router.post("/level", async (req, res) => {
-//   const { teamId, level } = req.body;
-//   const team = await Team.findOneAndUpdate({ id: teamId }, { level: level });
-//   console.log(team);
-//   res.json(team).status(200);
-// });
-
-router.post("/tape", async (req, res) => {
-  const teams = await Team.find();
-  for (let i = 0; i < teams.length; i++) {
-    teams[i].money -= 5000;
-    await teams[i].save();
-  }
-  req.io.emit("broadcast", {
-    title: "紙膠帶發動",
-    description: "紙膠帶狂暴黑料!所有小隊遭扣除5000元",
-  });
-  res.json("Success").status(200);
-});
-
-router.post("/goldenFruit", async (req, res) => {
-  const { building } = req.body;
-  const land = await Land.find({ id: building });
-  const level = land[0].level;
-  const targetTeam = await Team.find({ id: land[0].owner });
-  targetTeam[0].money +=
-    Math.round(
-      (land[0].price.buy + (land[0].level - 1) * land[0].price.upgrade) * 0.07
-    ) * 10;
-
-  land[0].owner = 0;
-  land[0].level = 0;
-  targetTeam[0].save();
-  land[0].save();
-  req.io.emit("broadcast", {
-    title: "金蔓莓果發動",
-    description: `${targetTeam[0].teamname}被使用了金蔓莓果！`,
-  });
-  res.json({ land, level }).status(200);
-});
-
 router
   .post("/add", async (req, res) => {
     const { id, dollar } = req.body;
@@ -1061,40 +1004,28 @@ router.post("/ownership", async (req, res) => {
   res.status(200).send("update succeeded");
 });
 
-router.post("/calcbonus", async (req, res) => {
-  const { teamId, land, level } = req.body;
-  const buildings = await Land.find({}).sort({ id: 1 });
-  console.log(req.body);
-  const targetBuilding = await Land.find({ name: land });
-
-  if (targetBuilding[0].id === 2 || targetBuilding[0].id === 3) {
-    buffings2(buildings, 1, 2);
-  } else if (targetBuilding[0].id === 9 || targetBuilding[0].id === 10) {
-    buffings2(buildings, 8, 9);
-  } else if (
-    targetBuilding[0].id === 13 ||
-    targetBuilding[0].id === 14 ||
-    targetBuilding[0].id === 15
-  ) {
-    buffings3(buildings, 12, 13, 14);
-  } else if (targetBuilding[0].id === 22 || targetBuilding[0].id === 23) {
-    buffings2(buildings, 21, 22);
-  } else if (
-    targetBuilding[0].id === 28 ||
-    targetBuilding[0].id === 29 ||
-    targetBuilding[0].id === 30
-  ) {
-    buffings3(buildings, 27, 28, 29);
-  } else if (
-    targetBuilding[0].id === 34 ||
-    targetBuilding[0].id === 35 ||
-    targetBuilding[0].id === 36
-  ) {
-    buffings3(buildings, 33, 34, 35);
-  } else if (targetBuilding[0].id === 39 || targetBuilding[0].id === 40) {
-    buffings2(buildings, 38, 39);
+router.post("/npcOwnership", async (req, res) => {
+  const { teamId, landId, moneyPaid } = req.body;
+  const tmp1 = await Land.findOneAndUpdate({ id: landId }, { owner: teamId });
+  if (!tmp1) {
+    res.status(403).send();
+    console.log("Update failed 1");
+    return;
   }
-  res.json("Success").status(200);
+  const prev_level = tmp1.level;
+  const tmp2 = await Land.findOneAndUpdate({ id: landId }, { level: prev_level+1 });
+  if (!tmp2) {
+    res.status(403).send();
+    console.log("Update failed 2");
+    return;
+  }
+
+  // handle netvalue
+  const team = await Team.findOne({ id: teamId });
+  team.propertyValue += moneyPaid;
+  await team.save();
+
+  res.status(200).send("update succeeded");
 });
 
 router.post("/aquire", async (req, res) => {
@@ -1299,5 +1230,56 @@ router.post("/loan", async (req, res) => {
 // router.get("/npcsecret", requireNPC, async (req, res) => {
 //   res.status(200).send("npc secret");
 // });
+
+router.post("/transferLand", async (req, res) => {
+  const { buyerTeamId, sellerTeamId, landId, amount } = req.body;
+
+  try {
+    // Fetch the land
+    const land = await Land.findOne({ id: landId });
+    if (!land) {
+      return res.status(404).send("Land not found");
+    }
+
+    // Verify seller owns the land
+    if (land.owner !== sellerTeamId) {
+      return res.status(403).send("Seller does not own this land");
+    }
+
+    // Fetch buyer and seller teams
+    const buyerTeam = await Team.findOne({ id: buyerTeamId });
+    const sellerTeam = await Team.findOne({ id: sellerTeamId });
+
+    if (!buyerTeam || !sellerTeam) {
+      return res.status(404).send("Team not found");
+    }
+
+    // Check if buyer has enough money
+    if (buyerTeam.money < amount) {
+      return res.status(403).send("Buyer does not have enough money");
+    }
+
+    // Transfer money and ownership
+    buyerTeam.money -= amount;
+    sellerTeam.money += amount;
+    land.owner = buyerTeamId;
+    // Level stays the same (no modification needed)
+
+    // Save changes
+    await buyerTeam.save();
+    await sellerTeam.save();
+    await land.save();
+
+    res.status(200).json({
+      message: "Land transfer successful",
+      land: land,
+      buyerTeam: buyerTeam,
+      sellerTeam: sellerTeam,
+    });
+  } catch (error) {
+    console.error("Land transfer error:", error);
+    res.status(500).send("Internal server error");
+  }
+});
 
 export default router;

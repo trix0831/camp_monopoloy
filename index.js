@@ -30,15 +30,15 @@ db.once("open", () => {
   app.use(express.json());
   app.use(cors());
   app.use(morgan("dev"));
-  app.use(express.static(path.join(process.cwd(), "frontend/build")));
+  app.use(express.static(path.join(process.cwd(), "backend/frontend_build")));
   app.use(function (request, response, next) {
     request.io = io;
     next();
   });
 
   app.use("/api", apiRouter);
-  app.get("/*", (req, res) => {
-    res.sendFile(path.join(process.cwd(), "frontend/build", "index.html"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(process.cwd(), "backend/frontend_build", "index.html"));
   });
 
   socket(io);

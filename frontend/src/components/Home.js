@@ -15,7 +15,7 @@ const Home = () => {
         }}
       />
       <img
-        src="/EEcampCover.jpg"
+        src="/mainPage.jpg"
         alt="Avengers"
         style={{
           maxWidth: "100%",
