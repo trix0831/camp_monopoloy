@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext } from "react";
 import {
   Paper,
   Table,
@@ -11,7 +11,6 @@ import {
 import RoleContext from "../useRole";
 import Loading from "../Loading";
 import axios from "../axios";
-//import User from "../../../../backend/models/user";
 
 const Teams = () => {
   const { teams, setTeams } = useContext(RoleContext);
@@ -26,7 +25,7 @@ const Teams = () => {
 
   const getTeams = async () => {
     axios
-      .get("/team") //res
+      .get("/team")
       .then((res) => {
         setTeams(res.data);
       })
@@ -59,7 +58,10 @@ const Teams = () => {
       >
         <TableContainer
           sx={{
-            maxHeight: 900,
+            // FIX: Changed from fixed 900px to dynamic viewport height.
+            // "75vh" means 75% of the screen height. 
+            // This ensures the table fits on mobile screens while keeping the sticky header.
+            maxHeight: "75vh", 
           }}
         >
           <Table stickyHeader aria-label="sticky table">
@@ -91,20 +93,19 @@ const Teams = () => {
                           align={column.align}
                           style={{ userSelect: "none" }}
                         >
-                            {
-                              column.id === "money"
-                                ? Math.round(team[column.id]) >= 0
-                                  ? Math.round(team[column.id])
-                                  : `${Math.round(team[column.id])} (破產)`
-                              : column.id === "loan"
-                                ? Math.round(team[column.id])
-                              : column.id === "propertyValue"
-                                ? Math.round(team[column.id])
-                              : column.id === "asset"
-                                ? Math.round(team.money + team.propertyValue - team.loan)
-                                : team[column.id]
-                            }
-
+                          {column.id === "money"
+                            ? Math.round(team[column.id]) >= 0
+                              ? Math.round(team[column.id])
+                              : `${Math.round(team[column.id])} (破產)`
+                            : column.id === "loan"
+                            ? Math.round(team[column.id])
+                            : column.id === "propertyValue"
+                            ? Math.round(team[column.id])
+                            : column.id === "asset"
+                            ? Math.round(
+                                team.money + team.propertyValue - team.loan
+                              )
+                            : team[column.id]}
                         </TableCell>
                       );
                     })}

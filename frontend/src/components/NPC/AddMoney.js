@@ -96,11 +96,11 @@ const AddMoney = () => {
       // Auto-set amount based on land ownership status
       if (data.owner === 0) {
         // No owner, use buy price
-        setAmount(data.price.buy.toString());
+        setAmount((data.price.buy*-1).toString());
       } else if (data.owner === team) {
         // Owned by this team, use upgrade price
         if (data.level < data.price.upgrade.length) {
-          setAmount(data.price.upgrade[data.level - 1].toString());
+          setAmount((data.price.upgrade[data.level - 1]*-1).toString());
         } else {
           setAmount("0");
         }
@@ -136,7 +136,7 @@ const AddMoney = () => {
   const handleSubmitAndSetOwnership = async () => {
     const payload = {
       id: team,
-      dollar: parseInt(amount*-1) ? parseInt(amount*-1) : 0,
+      dollar: parseInt(amount) ? parseInt(amount) : 0,
     };
     await axios.post("/add", payload);
 
@@ -155,11 +155,15 @@ const AddMoney = () => {
         disabled={team === -1}
         sx={{ marginBottom: 1, width: 80 }}
         onClick={() => {
-          if (!amount) {
-            handleAmount(val);
-          } else {
-            handleAmount(parseInt(amount) + val);
-          }
+          // 1. Safely parse the current amount. 
+          // If amount is "" or "-", parseInt returns NaN, so we default to 0.
+          const currentVal = parseInt(amount) || 0; 
+          
+          // 2. Add the button value
+          const newVal = currentVal + val;
+
+          // 3. Update state, converting back to string to satisfy the TextField
+          handleAmount(newVal.toString());
         }}
       >
         {val > 0 ? "+" : ""}
@@ -202,7 +206,7 @@ const AddMoney = () => {
         }}
       >
         <Typography component="h1" variant="h5" sx={{ marginBottom: 0 }}>
-          Add Money
+          Money and Properties
         </Typography>
         <FormControl variant="standard" sx={{ minWidth: 250 }}>
           <TeamSelect
@@ -258,7 +262,7 @@ const AddMoney = () => {
           >
             <SimpleMoneyButton val={+200} />
             <SimpleMoneyButton val={+400} />
-            <SimpleMoneyButton val={+500} />
+            <SimpleMoneyButton val={+2000} />
           </Box>
 
           <Grid container spacing={1}>
@@ -282,7 +286,8 @@ const AddMoney = () => {
                     team === -1 ||
                     amount === "0" ||
                     building === -1 ||
-                    (price.owner !== 0 && price.owner !== team)
+                    (price.owner !== 0 && price.owner !== team) ||
+                    newData < 0
                   }
                   onClick={handleSubmitAndSetOwnership}
                   fullWidth

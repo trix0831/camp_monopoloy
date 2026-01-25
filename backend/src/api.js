@@ -773,17 +773,40 @@ router.post("/series", async (req, res) => {
 });
 
 router.post("/soldout", async (req, res) => {
-  const { id, building } = req.body;
-  const team = await Team.find({ id: id });
-  const land = await Land.find({ id: building });
-  team[0].money +=
-    Math.round(
-      (land[0].price.buy + land[0].price.upgrade * (land[0].level - 1)) * 0.08
-    ) * 10;
-  land[0].level = 0;
-  land[0].owner = 0;
-  await team[0].save();
-  await land[0].save();
+  const { id, buildings, building } = req.body;
+  const buildingsToSell = Array.isArray(buildings) ? buildings : [building || buildings];
+  
+  const team = await Team.findOne({ id: parseInt(id) });
+  if (!team) return res.status(404).json("Team not found");
+
+  let totalMoneyGained = 0;
+  let totalPropertyValueLost = 0;
+
+  for (const buildingId of buildingsToSell) {
+    if (buildingId === undefined || buildingId === null) continue;
+    const land = await Land.findOne({ id: parseInt(buildingId) });
+    if (!land || land.owner !== parseInt(id)) continue;
+
+    const totalBuyPrice = land.price.buy;
+    const upgradeCost = (land.price.upgrade && Array.isArray(land.price.upgrade))
+      ? land.price.upgrade.slice(0, Math.max(0, land.level - 1)).reduce((a, b) => a + b, 0)
+      : 0;
+    const totalInvested = totalBuyPrice + upgradeCost;
+    const buybackPrice = Math.round(totalInvested * 0.6);
+
+    totalMoneyGained += buybackPrice;
+    totalPropertyValueLost += totalInvested;
+
+    land.level = 0;
+    land.owner = 0;
+    land.buffed = 0;
+    await land.save();
+  }
+
+  team.money += totalMoneyGained;
+  team.propertyValue = Math.max(0, team.propertyValue - totalPropertyValueLost);
+  await team.save();
+
   res.json("Success").status(200);
 });
 
@@ -1089,7 +1112,7 @@ router.post("/npcOwnership", async (req, res) => {
 
   // handle netvalue
   const team = await Team.findOne({ id: teamId });
-  team.propertyValue += moneyPaid;
+  team.propertyValue -= moneyPaid;
   await team.save();
 
   res.status(200).send("update succeeded");

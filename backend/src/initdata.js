@@ -354,7 +354,7 @@ const lands = [
     id: 19,
     type: "Building",
     area: 1,
-    name: "土地C5-企鵝村小學",
+    name: "土地C5-企鵝村中學",
     owner: 0,
     level: 0,
     buffed: 0,

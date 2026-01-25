@@ -17,13 +17,13 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
 export const NavBarItems = [
-  {
-    id: 1,
-    icon: <NotificationsIcon />,
-    label: "Notifications",
-    shortLabel: "Notifications",
-    route: "notifications",
-  },
+  // {
+  //   id: 1,
+  //   icon: <NotificationsIcon />,
+  //   label: "Notifications",
+  //   shortLabel: "Notifications",
+  //   route: "notifications",
+  // },
   {
     id: 2,
     icon: <PeopleIcon />,
@@ -114,13 +114,13 @@ export const adminItems = [
     shortLabel: "Loan",
     route: "loan",
   },
-  // {
-  //   id: 15,
-  //   icon: <PaidIcon />,
-  //   label: "Bankrupt",
-  //   shortLabel: "Bankrupt",
-  //   route: "bankrupt",
-  // },
+  {
+    id: 15,
+    icon: <PaidIcon />,
+    label: "Bankrupt",
+    shortLabel: "Bankrupt",
+    route: "bankrupt",
+  },
   {
     id: 16,
     icon: <VolumeUpIcon />,
