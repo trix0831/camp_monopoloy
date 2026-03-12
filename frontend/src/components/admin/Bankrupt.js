@@ -61,12 +61,27 @@ const Bankrupt = () => {
 
   // Calculate buyback price (60% of buy price + all upgrades)
   const calculateBuybackPrice = (property) => {
-    if (!property || !property.price) return 0;
-    const totalBuyPrice = property.price.buy;
-    const upgradeCost = property.price.upgrade
-      ? property.price.upgrade.slice(0, Math.max(0, property.level - 1)).reduce((a, b) => a + b, 0)
-      : 0;
-    const totalInvested = totalBuyPrice + upgradeCost;
+    // If property is undefined or null, return 0 to be safe
+    if (!property) return 0;
+
+    let totalInvested = 0;
+    
+    // Explicitly handle "Game" properties
+    if (property.type === "Game") {
+      totalInvested = 2000;
+    } else {
+      // For standard buildings
+      if (!property.price) return 0;
+      
+      const totalBuyPrice = property.price.buy;
+      const upgradeCost = property.price.upgrade
+        ? property.price.upgrade
+            .slice(0, Math.max(0, property.level - 1))
+            .reduce((a, b) => a + b, 0)
+        : 0;
+      totalInvested = totalBuyPrice + upgradeCost;
+    }
+    
     return Math.round(totalInvested * 0.6);
   };
 
@@ -200,12 +215,21 @@ const Bankrupt = () => {
                   </TableHead>
                   <TableBody>
                     {properties.map((property) => {
-                      const upgradeCost = property.price.upgrade
-                        ? property.price.upgrade
-                            .slice(0, Math.max(0, property.level - 1))
-                            .reduce((a, b) => a + b, 0)
-                        : 0;
-                      const totalInvested = property.price.buy + upgradeCost;
+                      let totalInvested = 0;
+                      let upgradeCost = 0;
+
+                      if (property.type === "Game") {
+                        totalInvested = 2000;
+                        upgradeCost = 0;
+                      } else {
+                        upgradeCost = property.price.upgrade
+                          ? property.price.upgrade
+                              .slice(0, Math.max(0, property.level - 1))
+                              .reduce((a, b) => a + b, 0)
+                          : 0;
+                        totalInvested = property.price.buy + upgradeCost;
+                      }
+
                       const buybackPrice = calculateBuybackPrice(property);
                       const isItemSelected = selected.includes(property.id);
 

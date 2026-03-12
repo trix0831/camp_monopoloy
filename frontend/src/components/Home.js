@@ -60,11 +60,12 @@ const Home = () => {
     <Container component="main" maxWidth="md">
       <Box
         sx={{
-          minHeight: "85vh",
+          marginTop: { xs: 8, md: 12 },
+          minHeight: "75vh",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           gap: 4,
           overflow: "hidden"
         }}
@@ -144,7 +145,7 @@ const Home = () => {
               ease: "easeInOut",
             }}
             style={{
-              width: "100%",
+              width: "80%",
               maxWidth: "600px",
               borderRadius: "20px",
               boxShadow: "0px 20px 50px rgba(0,0,0,0.3)",

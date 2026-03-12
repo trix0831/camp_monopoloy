@@ -16,6 +16,7 @@ import {
   TableRow,
   TableCell,
   Table,
+  Alert,
   // Divider,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
@@ -44,32 +45,17 @@ const Transfer = () => {
   const { roleId, filteredBuildings, setNavBarId } = useContext(RoleContext);
   const navigate = useNavigate();
 
-  const handleFrom = async (from) => {
-    const { data } = await axios.get("/team/" + from);
+  const handleTo = async (to) => {
+    const { data } = await axios.get("/team/" + to);
     // console.log(data);
-    setFromData(data);
-    setFrom(from);
+    setToData(data);
+    setTo(to);
   };
 
-  const handleTo = async (to, newBuildingData) => {
-    const { data: toData } = await axios.get("/team/" + to);
-    setToData(toData);
-    setTo(to);
-
-    /*if the "to" is not the owner and is affected by hawkeye, 
-    then set the price equal to the 40% rent of hawkeye's building */
-
-    // console.log(to !== buildingData.owner);
-    // console.log(buildingData.id !== buildingData.hawkEye);
-    // console.log(buildingData);
-    // if (buildingData === null) return;
-    const data = newBuildingData !== undefined ? newBuildingData : buildingData;
-    if (to !== data.owner && data.id !== data.hawkEye) {
-      const res = await axios.get("/land/" + data.hawkEye);
-      console.log(res.data);
-      setAmount(Math.round(0.4 * res.data.rent[res.data.level - 1]));
-      setErrorMessage("Auto Fill Hawk Eye");
-    }
+  const handleFrom = async (from) => {
+    const { data: fromData } = await axios.get("/team/" + from);
+    setFromData(fromData);
+    setFrom(from);
   };
 
   const FetchFinal = async () => {
@@ -113,7 +99,11 @@ const Transfer = () => {
       setBuilding(building);
       setBuildingData(data);
       if (data.owner !== 0) {
-        handleTo(data.owner, data);
+        handleTo(data.owner); 
+      } else {
+        setTo(-1);
+        setToData({ teamname: "no owner" });
+        setFinalData({});
       } 
 
       const res = await axios.post("/series", {
@@ -132,6 +122,9 @@ const Transfer = () => {
     } else {
       setBuilding(-1);
       setBuildingData({});
+      setTo(-1);
+      setToData({});
+      setAmount(0);
     }
   };
 
@@ -142,7 +135,7 @@ const Transfer = () => {
   }, [roleId]);
 
   useEffect(() => {
-    if (from !== -1 && to !== -1 && amount !== 0 && from !== to) {
+    if (from !== -1 && to !== -1 && amount && parseInt(amount) > 0 && from !== to) {
       FetchFinal();
     }
   }, [from, to, amount]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -227,8 +220,8 @@ const Transfer = () => {
               </TableRow>
               <TableRow>
                 <TableCell align="center">Team</TableCell>
-                <TableCell align="center">{from}</TableCell>
-                <TableCell align="center">{to}</TableCell>
+                <TableCell align="center">{fromData.teamname}</TableCell>
+                <TableCell align="center">{toData.teamname}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell align="center">Before</TableCell>
@@ -271,22 +264,25 @@ const Transfer = () => {
             }}
           >
             <MenuItem value={-1}>Select Building</MenuItem>
-            {filteredBuildings.map((item) => (
-              <MenuItem value={item.id} key={item.id}>
-                {item.id} {item.name}
-              </MenuItem>
-            ))}
+            {filteredBuildings
+              .filter((item) => item.type !== "Game")
+              .map((item) => (
+                <MenuItem value={item.id} key={item.id}>
+                  {item.id} {item.name}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
         <FormControl
           variant="standard"
           sx={{ minWidth: "250px", marginTop: 1 }}
         >
-          <TeamSelect
-            label="From.."
-            team={from}
-            handleTeam={handleFrom}
-            hasZero={false}
+          <InputLabel shrink>To (Owner)</InputLabel>
+          <TextField
+            disabled
+            value={building === -1 ? "" : (toData.teamname || "no owner")}
+            variant="standard"
+            sx={{ marginTop: 2 }}
           />
         </FormControl>
         <FormControl
@@ -294,12 +290,17 @@ const Transfer = () => {
           sx={{ minWidth: "250px", marginTop: 1 }}
         >
           <TeamSelect
-            label="To.."
-            team={to}
-            handleTeam={handleTo}
+            label="From (Visitor)"
+            team={from}
+            handleTeam={handleFrom}
             hasZero={false}
             sx={{ marginBottom: 2 }}
           />
+          {fromData.money < 0 && (
+            <Alert severity="error" sx={{ marginBottom: 1 }}>
+              This team is broke!
+            </Alert>
+          )}
         </FormControl>
 
         {/* <FormControl
@@ -456,7 +457,7 @@ const Transfer = () => {
 
           <Button
             variant="contained"
-            disabled={!(from && to && amount) || from === to}
+            disabled={!(from && to && amount) || from === to || fromData.money < 0}
             onClick={handleClick}
             fullWidth
             sx={{ marginTop: 1 }}

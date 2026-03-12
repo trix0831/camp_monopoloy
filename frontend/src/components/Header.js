@@ -60,7 +60,9 @@ const Header = () => {
     setFilteredBuildings(
       buildings.filter(
         (building) =>
-          building.type === "Building" || building.type === "SpecialBuilding"
+          building.type === "Building" || 
+          building.type === "SpecialBuilding" || 
+          building.type === "Game"
       )
     );
   };

@@ -67,7 +67,8 @@ const PropertyCard = forwardRef((props, ref) => {
 
   const colorData = type === "Building" ? colors[type][area] : colors[type];
   let levelIcon = [];
-  for (let i = 0; i < 5; i++) {
+  const maxIcons = type === "Game" ? 1 : 5;
+  for (let i = 0; i < maxIcons; i++) {
     if (i < level) {
       levelIcon.push(<HomeRoundedIcon style={{ color: "#63f74f" }} key={i} />);
     } else {
@@ -82,8 +83,11 @@ const PropertyCard = forwardRef((props, ref) => {
       setBuy(price.buy);
       setUpgrade(price.upgrade);
       setOpen(true);
+    } else if (type === "Game") {
+      setBuy(2000);
+      setUpgrade("N/A");
+      setOpen(true);
     }
-    console.log(price.buy);
   };
   const handleClose = () => {
     setOpen(false);
@@ -136,7 +140,7 @@ const PropertyCard = forwardRef((props, ref) => {
                 {name}
               </Typography>
             </Grid>
-            {type === "Building" || type === "SpecialBuilding" ? (
+            {type === "Building" || type === "SpecialBuilding" || type === "Game" ? (
               <Grid item>
                 <Typography variant="caption">
                   {owner === 0 ? <br /> : teamName}
@@ -148,7 +152,7 @@ const PropertyCard = forwardRef((props, ref) => {
               </Grid>
             )}
           </Grid>
-          {type === "Building" && (
+          {(type === "Building" || type === "Game") && (
             <Grid
               item
               xs={5}
@@ -228,15 +232,17 @@ const PropertyCard = forwardRef((props, ref) => {
               sx={{ fontWeight: 700 }}
               component="h4"
             >
-              {`地產花費： 購買 ${buy}  升級 ${upgrade} `}
+              {`地產花費： 購買 ${buy}  ${type === "Game" ? "" : `升級 ${upgrade}`}`}
             </Typography>
-            <Typography
-              id="modal-modal-description-2"
-              sx={{ fontWeight: 700, fontSize: "0.9rem" }}
-              component="h5"
-            >
-              {`過路費： 一星 ${rent[0]} 二星 ${rent[1]} 三星 ${rent[2]} 四星 ${rent[3]} 五星 ${rent[4]} `}
-            </Typography>
+            {type === "Building" && (
+              <Typography
+                id="modal-modal-description-2"
+                sx={{ fontWeight: 700, fontSize: "0.9rem" }}
+                component="h5"
+              >
+                {`過路費： 一星 ${rent[0]} 二星 ${rent[1]} 三星 ${rent[2]} 四星 ${rent[3]} 五星 ${rent[4]} `}
+              </Typography>
+            )}
           </Box>
         </Box>
       </Modal>

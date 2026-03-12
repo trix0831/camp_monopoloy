@@ -208,6 +208,12 @@ const TransferLand = () => {
           </Select>
         </FormControl>
 
+        {buyerData.money < 0 && (
+          <Alert severity="error" sx={{ mt: 2, width: 300 }}>
+            This team is broke!
+          </Alert>
+        )}
+
         {/* Seller Team Display */}
         {sellerTeam !== -1 && (
           <FormControl variant="standard" sx={{ minWidth: 300, marginTop: 2 }} disabled>
@@ -226,11 +232,13 @@ const TransferLand = () => {
           <InputLabel>Land/Building to Transfer</InputLabel>
           <Select value={land} onChange={(e) => handleLand(e.target.value)}>
             <MenuItem value={-1}>Select Land</MenuItem>
-            {filteredBuildings.map((item) => (
-              <MenuItem value={item.id} key={item.id}>
-                {item.id} {item.name}
-              </MenuItem>
-            ))}
+            {filteredBuildings
+              .filter((item) => item.type !== "Game")
+              .map((item) => (
+                <MenuItem value={item.id} key={item.id}>
+                  {item.id} {item.name}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
 
@@ -341,7 +349,8 @@ const TransferLand = () => {
                 sellerTeam === -1 ||
                 land === -1 ||
                 error ||
-                buyerData.money < transferAmount
+                buyerData.money < transferAmount ||
+                buyerData.money < 0
               }
               onClick={handleTransfer}
               fullWidth

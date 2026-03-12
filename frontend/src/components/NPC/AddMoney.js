@@ -17,6 +17,7 @@ import {
   Paper,
   Grid,
   TableBody,
+  Alert,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
@@ -83,7 +84,14 @@ const AddMoney = () => {
     if (building > 0) {
       const { data } = await axios.get("/land/" + building);
       setBuilding(building);
-      setPrice({ ...data.price, level: data.level, owner: data.owner });
+      
+      let currentPrice = {};
+      if (data.type === "Game") {
+        currentPrice = { buy: 2000, upgrade: [], level: data.level, owner: data.owner, type: "Game" };
+      } else {
+        currentPrice = { ...data.price, level: data.level, owner: data.owner, type: data.type };
+      }
+      setPrice(currentPrice);
       
       // Fetch owner team name if land has an owner
       if (data.owner !== 0 && data.owner !== undefined && data.owner !== -1) {
@@ -96,11 +104,13 @@ const AddMoney = () => {
       // Auto-set amount based on land ownership status
       if (data.owner === 0) {
         // No owner, use buy price
-        setAmount((data.price.buy*-1).toString());
+        setAmount((currentPrice.buy * -1).toString());
       } else if (data.owner === team) {
         // Owned by this team, use upgrade price
-        if (data.level < data.price.upgrade.length) {
-          setAmount((data.price.upgrade[data.level - 1]*-1).toString());
+        if (data.type === "Game") {
+          setAmount("0"); // Game cannot be upgraded
+        } else if (data.level < currentPrice.upgrade.length) {
+          setAmount((currentPrice.upgrade[data.level - 1] * -1).toString());
         } else {
           setAmount("0");
         }
@@ -215,6 +225,11 @@ const AddMoney = () => {
             handleTeam={handleTeam}
             hasZero={false}
           />
+          {teamData.money < 0 && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              This team is broke!
+            </Alert>
+          )}
 
           <TextField
             required
@@ -270,7 +285,7 @@ const AddMoney = () => {
               <Box display="flex" flexDirection="row" justifyContent="center">
                 <Button
                   variant="contained"
-                  disabled={team === -1 || amount === "" || building !== -1}
+                  disabled={team === -1 || amount === "" || building !== -1 || teamData.money < 0}
                   onClick={handleSubmit}
                   fullWidth
                 >
@@ -287,7 +302,8 @@ const AddMoney = () => {
                     amount === "0" ||
                     building === -1 ||
                     (price.owner !== 0 && price.owner !== team) ||
-                    newData < 0
+                    newData < 0 ||
+                    teamData.money < 0
                   }
                   onClick={handleSubmitAndSetOwnership}
                   fullWidth
@@ -378,7 +394,7 @@ const AddMoney = () => {
               )}
               {price.owner === team && (
                 <Typography component="h2" variant="body2" sx={{ marginBottom: 0 }}>
-                  Action: Upgrade
+                  Action: {price.type === "Game" ? "Max Level" : "Upgrade"}
                 </Typography>
               )}
               <Typography component="h2" variant="body2" sx={{ marginBottom: 0.5 }}>
