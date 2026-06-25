@@ -1,11 +1,12 @@
 import PeopleIcon from "@mui/icons-material/People";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import VillaIcon from "@mui/icons-material/Villa";
+import StorefrontIcon from "@mui/icons-material/Storefront";
 import PaidIcon from "@mui/icons-material/Paid";
 import BuildIcon from "@mui/icons-material/Build";
 import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
-import EventIcon from "@mui/icons-material/Event";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import MapIcon from "@mui/icons-material/Map";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
@@ -58,16 +59,23 @@ export const NPCItems = [
   {
     id: 6,
     icon: <PaidIcon />,
-    label: "Money and Property",
+    label: "Control Money",
     shortLabel: "Money",
     route: "addmoney",
+  },
+  {
+    id: 8,
+    icon: <StorefrontIcon />,
+    label: "Buy Property",
+    shortLabel: "Buy",
+    route: "buyproperty",
   },
   {
     id: 7,
     icon: <CurrencyExchangeIcon />,
     label: "Toll",
-    shortLabel: "Transfer",
-    route: "transfer",
+    shortLabel: "Toll",
+    route: "toll",
   },
   // {
   //   id: 9,
@@ -88,9 +96,9 @@ export const NPCItems = [
 export const adminItems = [
   {
     id: 10,
-    icon: <EventIcon />,
+    icon: <RestartAltIcon />,
     label: "Reset",
-    shortLabel: "Event",
+    shortLabel: "RESET",
     route: "event",
   },
   {

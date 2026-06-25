@@ -27,6 +27,7 @@ const Additional = () => {
     "使你的房地產租金提升至150%, 效果持續10分鐘。不可疊加使用"
   );
   const [open, setOpen] = useState(false);
+  const [acqMultiplier, setAcqMultiplier] = useState(3);
   const { roleId } = useContext(RoleContext);
   const navigate = useNavigate();
 
@@ -34,6 +35,11 @@ const Additional = () => {
     const payload = { teamname: team, title };
     await axios.post("/effect", payload);
     navigate("/notifications");
+  };
+
+  const handleMultiplierChange = async (value) => {
+    setAcqMultiplier(value);
+    await axios.post("/acquisitionMultiplier", { value });
   };
 
   useEffect(() => {
@@ -48,17 +54,54 @@ const Additional = () => {
       .catch((err) => {
         console.log(err);
       });
+    axios
+      .get("/acquisitionMultiplier")
+      .then((res) => {
+        setAcqMultiplier(res.data.value);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const multiplierControl = (
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 10,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Typography component="h1" variant="h5">
+          收購倍率 (Acquisition Multiplier)
+        </Typography>
+        <FormControl variant="standard" sx={{ minWidth: 250, marginTop: 2 }}>
+          <InputLabel id="acq-multiplier">Multiplier</InputLabel>
+          <Select
+            value={acqMultiplier}
+            id="acq-multiplier"
+            onChange={(e) => handleMultiplierChange(e.target.value)}
+          >
+            <MenuItem value={3}>3x (12:35–13:00)</MenuItem>
+            <MenuItem value={4}>4x (13:00–13:40)</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+    </Container>
+  );
+
   if (effects.length === 0) {
-    return <Loading />;
+    return multiplierControl;
   } else {
     return (
       <Container component="main" maxWidth="xs">
+        {multiplierControl}
         <Box
           sx={{
-            marginTop: 10,
+            marginTop: 4,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",

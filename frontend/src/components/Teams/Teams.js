@@ -49,19 +49,17 @@ const Teams = () => {
       <Paper
         elevation={0}
         sx={{
-          overflow: "hidden",
           paddingTop: "60px",
-          paddingBottom: "60px",
+          paddingBottom: "56px",
           marginLeft: "2vw",
           marginRight: "2vw",
         }}
       >
         <TableContainer
           sx={{
-            // FIX: Changed from fixed 900px to dynamic viewport height.
-            // "75vh" means 75% of the screen height. 
-            // This ensures the table fits on mobile screens while keeping the sticky header.
-            maxHeight: "75vh", 
+            maxHeight: "calc(100dvh - 116px)",
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
           }}
         >
           <Table stickyHeader aria-label="sticky table">

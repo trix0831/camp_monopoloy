@@ -29,8 +29,8 @@ const Event = () => {
   const [tempPhase, setTempPhase] = useState(1);
   const [events, setEvents] = useState([]);
   
-  // New state for confirmation dialog
   const [openDialog, setOpenDialog] = useState(false);
+  const [resetInput, setResetInput] = useState("");
 
   const { role, setPhase } = useContext(RoleContext);
   const navigate = useNavigate();
@@ -59,15 +59,11 @@ const Event = () => {
     navigate("/teams");
   };
 
-  // This function remains the same, but it is now called by the Dialog
   const handleReset = async () => {
-    // Close dialog first
     setOpenDialog(false);
-    
+    setResetInput("");
     try {
-      console.log("reset");
       await axios.post("/reset", {});
-      navigate("/teams");
     } catch (error) {
       console.error("There was an error resetting:", error);
     }
@@ -129,10 +125,7 @@ const Event = () => {
                   backgroundColor: "darkred",
                 },
               }}
-              // UPDATE: Don't run reset immediately, open the dialog instead
-              onClick={() => {
-                setOpenDialog(true);
-              }}
+              onClick={() => { setResetInput(""); setOpenDialog(true); }}
             >
               RESET
             </Button>
@@ -143,36 +136,40 @@ const Event = () => {
 
         {/* ... existing commented out code ... */}
 
-        {/* --- CONFIRMATION DIALOG START --- */}
         <Dialog
           open={openDialog}
-          onClose={() => setOpenDialog(false)}
+          onClose={() => { setOpenDialog(false); setResetInput(""); }}
           aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">
-            {"Confirm Reset?"}
-          </DialogTitle>
+          <DialogTitle id="alert-dialog-title">Confirm Reset?</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Are you sure you want to reset? This action cannot be undone and will reset everything.
+            <DialogContentText sx={{ mb: 2 }}>
+              This will reset ALL game data. Type <strong>reset</strong> to confirm.
             </DialogContentText>
+            <TextField
+              autoFocus
+              fullWidth
+              size="small"
+              placeholder="type reset"
+              value={resetInput}
+              onChange={(e) => setResetInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && resetInput === "reset") handleReset(); }}
+            />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenDialog(false)} color="primary">
+            <Button onClick={() => { setOpenDialog(false); setResetInput(""); }} color="primary">
               Cancel
             </Button>
-            <Button 
-              onClick={handleReset} 
-              color="error" 
+            <Button
+              onClick={handleReset}
+              color="error"
               variant="contained"
-              autoFocus
+              disabled={resetInput !== "reset"}
             >
               Confirm
             </Button>
           </DialogActions>
         </Dialog>
-        {/* --- CONFIRMATION DIALOG END --- */}
       </Container>
     );
   }

@@ -8,6 +8,7 @@ import Pair from "../models/pair.js";
 import Effect from "../models/effect.js";
 import Broadcast from "../models/broadcast.js";
 import Resource from "../models/resource.js";
+import { initialTeams, initialLands, initialPairs } from "./gameData.js";
 const router = express.Router();
 
 const buffBuildings2 = async (building_1, building_2) => {
@@ -523,28 +524,58 @@ router.get("/allEvents", async (req, res) => {
   res.json(events).status(200);
 });
 
+router
+  .get("/acquisitionMultiplier", async (req, res) => {
+    const pair = await Pair.findOne({ key: "acquisitionMultiplier" });
+    res.json({ value: pair ? pair.value : 3 }).status(200);
+  })
+  .post("/acquisitionMultiplier", async (req, res) => {
+    const value = Number(req.body.value);
+    if (value !== 3 && value !== 4) {
+      return res.status(400).json({ error: "Multiplier must be 3 or 4" });
+    }
+    await Pair.findOneAndUpdate(
+      { key: "acquisitionMultiplier" },
+      { value },
+      { upsert: true }
+    );
+    res.json({ value }).status(200);
+  });
+
 router.post("/reset", async(req, res) =>{
   console.log("RESET");
 
-  //reset everything
-  const teams = await Team.find();
-  const resources = await Resource.find();
-
-  for(let i = 0; i < teams.length; i++) {
-    teams[i].money = 8000;
-    teams[i].loan = 0;
-    teams[i].propertyValue = 0;
-    await teams[i].save();
+  // Restore teams to canonical initial state (names + game state)
+  for (const init of initialTeams) {
+    await Team.findOneAndUpdate(
+      { id: init.id },
+      { teamname: init.teamname, money: init.money, loan: init.loan, propertyValue: init.propertyValue },
+      { upsert: true }
+    );
   }
 
-
-  const lands = await Land.find();
-  //set all lands to 0
-  for(let i = 0; i < lands.length; i++) {
-    lands[i].owner = 0;
-    lands[i].level = 0;
-    await lands[i].save();
+  // Restore lands to canonical initial state (names, prices, rent + game state)
+  for (const init of initialLands) {
+    await Land.findOneAndUpdate(
+      { id: init.id },
+      { ...init, owner: 0, level: 0, buffed: 0 },
+      { upsert: true }
+    );
   }
+
+  // Reset pair values (currentEvent, hawkEyeTeam, lastNotificationId, phase, acquisitionMultiplier)
+  for (const init of initialPairs) {
+    await Pair.findOneAndUpdate(
+      { key: init.key },
+      { value: init.value },
+      { upsert: true }
+    );
+  }
+
+  // Clear all broadcasts
+  await Broadcast.deleteMany({});
+
+  res.status(200).send("reset succeeded");
 })
 
 router
@@ -1079,12 +1110,15 @@ router.get("/transfer", async (req, res) => {
 
 // Helper function to calculate net value based on level
 const calculateNetValue = (buyPrice, upgradePrices, level) => {
-  if (level === 0) return 0;
-  let total = buyPrice; // Level 1 costs buyPrice
+  if (!level || level === 0) return 0;
+  if (!buyPrice || isNaN(buyPrice)) return 0;
+  let total = buyPrice;
   for (let i = 1; i < level; i++) {
-    total += upgradePrices[i - 1]; // Level i+1 costs upgradePrices[i-1]
+    const cost = upgradePrices?.[i - 1];
+    if (cost == null || isNaN(cost)) break;
+    total += cost;
   }
-  return total;
+  return isNaN(total) ? 0 : total;
 };
 
 router.post("/ownership", async (req, res) => {
@@ -1136,8 +1170,8 @@ router.post("/ownership", async (req, res) => {
     // Different owner: remove old net value from old owner, add new net value to new owner
     if (oldOwner !== 0) { // 0 means NPC/no owner
       const oldOwnerTeam = await Team.findOne({ id: oldOwner });
-      if (oldOwnerTeam) {
-        oldOwnerTeam.propertyValue -= oldNetValue;
+      if (oldOwnerTeam && !isNaN(oldNetValue)) {
+        oldOwnerTeam.propertyValue = (isNaN(oldOwnerTeam.propertyValue) ? 0 : oldOwnerTeam.propertyValue) - oldNetValue;
         await oldOwnerTeam.save();
       }
     }
@@ -1145,8 +1179,8 @@ router.post("/ownership", async (req, res) => {
     // Only add new net value if property is not removed (level > 0)
     if (level > 0) {
       const newOwnerTeam = await Team.findOne({ id: teamId });
-      if (newOwnerTeam) {
-        newOwnerTeam.propertyValue += newNetValue;
+      if (newOwnerTeam && !isNaN(newNetValue)) {
+        newOwnerTeam.propertyValue = (isNaN(newOwnerTeam.propertyValue) ? 0 : newOwnerTeam.propertyValue) + newNetValue;
         await newOwnerTeam.save();
       }
     }
@@ -1155,8 +1189,10 @@ router.post("/ownership", async (req, res) => {
     const ownerTeam = await Team.findOne({ id: teamId });
     if (ownerTeam) {
       const netValueDifference = newNetValue - oldNetValue;
-      ownerTeam.propertyValue += netValueDifference;
-      await ownerTeam.save();
+      if (!isNaN(netValueDifference)) {
+        ownerTeam.propertyValue = (isNaN(ownerTeam.propertyValue) ? 0 : ownerTeam.propertyValue) + netValueDifference;
+        await ownerTeam.save();
+      }
     }
   }
 
@@ -1399,7 +1435,7 @@ router.post("/loan", async (req, res) => {
 // });
 
 router.post("/transferLand", async (req, res) => {
-  const { buyerTeamId, sellerTeamId, landId, amount } = req.body;
+  const { buyerTeamId, sellerTeamId, landId, multiplier: reqMultiplier } = req.body;
 
   try {
     // Fetch the land
@@ -1421,6 +1457,24 @@ router.post("/transferLand", async (req, res) => {
       return res.status(404).send("Team not found");
     }
 
+    // Compute the buyout price authoritatively on the server:
+    // 收購費用 = 該地淨值 (買價 + 已升級費用) × 收購倍率 (admin-controlled 3 or 4).
+    const netValue = calculateNetValue(
+      land.price.buy,
+      land.price.upgrade,
+      land.level
+    );
+    // Prefer the per-transaction choice (3 or 4); otherwise fall back to the
+    // admin-controlled global multiplier.
+    let multiplier;
+    if (Number(reqMultiplier) === 3 || Number(reqMultiplier) === 4) {
+      multiplier = Number(reqMultiplier);
+    } else {
+      const multiplierPair = await Pair.findOne({ key: "acquisitionMultiplier" });
+      multiplier = multiplierPair ? multiplierPair.value : 3;
+    }
+    const amount = netValue * multiplier;
+
     // Check if buyer has enough money
     if (buyerTeam.money < amount) {
       return res.status(403).send("Buyer does not have enough money");
@@ -1431,8 +1485,9 @@ router.post("/transferLand", async (req, res) => {
     sellerTeam.money += amount;
     land.owner = buyerTeamId;
     // Level stays the same (no modification needed)
-    buyerTeam.propertyValue += amount/4;
-    sellerTeam.propertyValue -= amount/4;
+    // 土地變現值 tracks net value, so move netValue between the teams.
+    buyerTeam.propertyValue += netValue;
+    sellerTeam.propertyValue -= netValue;
 
     // Save changes
     await buyerTeam.save();

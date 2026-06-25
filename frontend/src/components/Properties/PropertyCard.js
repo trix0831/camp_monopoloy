@@ -1,6 +1,5 @@
 import { React, useState, useContext, useEffect, forwardRef} from "react";
 import { Grid, Paper, Typography, Modal, Box, Button } from "@mui/material";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import HouseIcon from "@mui/icons-material/House";
 import RoleContext from "../useRole";
@@ -26,6 +25,9 @@ const colors = {
   Random: "rgb(153,0,153)",
   Go: "rgb(247,207,0)",
   Bank: "rgb(180,247,141)",
+  Hospital: "rgb(255,99,132)",
+  Platform: "rgb(120,180,90)",
+  Candy: "rgb(240,160,200)",
 };
 
 const PropertyCard = forwardRef((props, ref) => {
@@ -67,25 +69,28 @@ const PropertyCard = forwardRef((props, ref) => {
 
   const colorData = type === "Building" ? colors[type][area] : colors[type];
   let levelIcon = [];
-  const maxIcons = type === "Game" ? 1 : 5;
+  const maxIcons = 4;
   for (let i = 0; i < maxIcons; i++) {
-    if (i < level) {
-      levelIcon.push(<HomeRoundedIcon style={{ color: "#63f74f" }} key={i} />);
-    } else {
-      levelIcon.push(
-        <HomeRoundedIcon style={{ color: "rgb(160,160,160)" }} key={i} />
-      );
-    }
+    levelIcon.push(
+      <Typography
+        key={i}
+        component="span"
+        sx={{
+          fontSize: "1.2rem",
+          lineHeight: 1,
+          opacity: i < level ? 1 : 0.25,
+          filter: i < level ? "none" : "grayscale(1)",
+        }}
+      >
+        🦉
+      </Typography>
+    );
   }
 
   const handleView = () => {
     if (type === "Building") {
       setBuy(price.buy);
       setUpgrade(price.upgrade);
-      setOpen(true);
-    } else if (type === "Game") {
-      setBuy(2000);
-      setUpgrade("N/A");
       setOpen(true);
     }
   };
@@ -140,7 +145,7 @@ const PropertyCard = forwardRef((props, ref) => {
                 {name}
               </Typography>
             </Grid>
-            {type === "Building" || type === "SpecialBuilding" || type === "Game" ? (
+            {type === "Building" || type === "SpecialBuilding" ? (
               <Grid item>
                 <Typography variant="caption">
                   {owner === 0 ? <br /> : teamName}
@@ -152,7 +157,7 @@ const PropertyCard = forwardRef((props, ref) => {
               </Grid>
             )}
           </Grid>
-          {(type === "Building" || type === "Game") && (
+          {type === "Building" && (
             <Grid
               item
               xs={5}
@@ -180,9 +185,11 @@ const PropertyCard = forwardRef((props, ref) => {
             minWidth: 250,
             margin: 4,
             paddingLeft: 1,
-            border: "solid 5px rgb(255,102,102)",
-            borderRadius: "5px",
-            backgroundColor: "rgb(255,253,236)",
+            border: "3px solid",
+            borderColor: "primary.main",
+            borderRadius: "12px",
+            backgroundColor: "background.paper",
+            color: "text.primary",
             height: 250,
             justifyContent: "space-around",
           }}
@@ -201,7 +208,7 @@ const PropertyCard = forwardRef((props, ref) => {
               component="h2"
               sx={{ fontWeight: 1000 }}
             >
-              房產資訊
+              土地資訊
             </Typography>
           </Box>
           <Box
@@ -218,21 +225,21 @@ const PropertyCard = forwardRef((props, ref) => {
               sx={{ fontWeight: 700 }}
               component="h5"
             >
-              {`地產名稱：${name}`}
+              {`土地名稱：${name}`}
             </Typography>
             <Typography
               id="modal-modal-description-2"
               sx={{ fontWeight: 700 }}
               component="h5"
             >
-              {`地產持有人：${owner === 0 ? "無" : teamName}`}
+              {`土地持有人：${owner === 0 ? "無" : teamName}`}
             </Typography>
             <Typography
               id="modal-modal-description-2"
               sx={{ fontWeight: 700 }}
               component="h4"
             >
-              {`地產花費： 購買 ${buy}  ${type === "Game" ? "" : `升級 ${upgrade}`}`}
+              {`土地花費： 購買 ${buy}  ${type === "Game" ? "" : `升級 ${upgrade}`}`}
             </Typography>
             {type === "Building" && (
               <Typography
@@ -240,7 +247,7 @@ const PropertyCard = forwardRef((props, ref) => {
                 sx={{ fontWeight: 700, fontSize: "0.9rem" }}
                 component="h5"
               >
-                {`過路費： 一星 ${rent[0]} 二星 ${rent[1]} 三星 ${rent[2]} 四星 ${rent[3]} 五星 ${rent[4]} `}
+                {`購買資金：初級 ${rent[0]} 中級 ${rent[1]} 高級 ${rent[2]} 頂級 ${rent[3]} `}
               </Typography>
             )}
           </Box>

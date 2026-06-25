@@ -147,7 +147,6 @@ const Bankrupt = () => {
               width: "100%",
               padding: 2,
               marginBottom: 3,
-              backgroundColor: "#f5f5f5",
             }}
           >
             <Typography variant="h6" sx={{ marginBottom: 1 }}>
@@ -192,7 +191,7 @@ const Bankrupt = () => {
               <TableContainer>
                 <Table size="small">
                   <TableHead>
-                    <TableRow sx={{ backgroundColor: "#e0e0e0" }}>
+                    <TableRow sx={{ backgroundColor: "rgba(215,183,101,0.08)" }}>
                       <TableCell padding="checkbox">
                         <Checkbox
                           indeterminate={selected.length > 0 && selected.length < properties.length}
@@ -249,7 +248,7 @@ const Bankrupt = () => {
                           <TableCell>{property.name}</TableCell>
                           <TableCell align="center">{property.level}</TableCell>
                           <TableCell align="right">${totalInvested}</TableCell>
-                          <TableCell align="right" sx={{ fontWeight: "bold", color: "#2e7d32" }}>
+                          <TableCell align="right" sx={{ fontWeight: "bold", color: "success.main" }}>
                             ${buybackPrice}
                           </TableCell>
                         </TableRow>

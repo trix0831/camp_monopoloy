@@ -45,9 +45,6 @@ const SetOwnership = () => {
   };
 
   const handleTeam = (team) => {
-    if (team === 0) {
-      setLevel(0);
-    }
     setTeam(team);
   };
 
@@ -118,7 +115,7 @@ const SetOwnership = () => {
               label="Team"
               team={team}
               handleTeam={handleTeam}
-              hasZero={true}
+              hasZero={false}
             />
             {team !== buildingData.owner && team !== -1 && building !== -1 ? (
               <FormHelperText error={true}>Owner has Change!!!</FormHelperText>
@@ -129,7 +126,7 @@ const SetOwnership = () => {
             <Select
               value={level}
               labelId="level-building"
-              disabled={team === 0}
+              disabled={team === -1}
               onChange={(e) => {
                 setLevel(e.target.value);
               }}
@@ -140,7 +137,6 @@ const SetOwnership = () => {
               <MenuItem value={2}>2</MenuItem>
               <MenuItem value={3}>3</MenuItem>
               <MenuItem value={4}>4</MenuItem>
-              <MenuItem value={5}>5</MenuItem>
             </Select>
             {/* {level - buildingData.level !== 1 &&
             team !== -1 &&

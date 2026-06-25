@@ -18,6 +18,8 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
@@ -35,6 +37,7 @@ const TransferLand = () => {
   const [land, setLand] = useState(-1);
   const [landData, setLandData] = useState({});
   const [transferAmount, setTransferAmount] = useState(0);
+  const [multiplier, setMultiplier] = useState(3);
   const [showPreview, setShowPreview] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -76,7 +79,12 @@ const TransferLand = () => {
     if (landData.level <= 1) {
       return 0;
     }
-    return (landData.level - 1) * landData.price.upgrade[landData.level - 2];
+    // Sum the cost of every upgrade tier reached: upgrade[0..level-2].
+    let total = 0;
+    for (let i = 0; i < landData.level - 1; i++) {
+      total += landData.price.upgrade[i];
+    }
+    return total;
   };
 
   // Add a 4th argument: specificLandData
@@ -112,10 +120,10 @@ const TransferLand = () => {
       return;
     }
 
-    // Calculate transfer amount
+    // Calculate transfer amount (preview only; backend recomputes authoritatively)
     const upgradeCost = calculateUpgradeCost(currentLandData);
     const netValue = currentLandData.price.buy + upgradeCost;
-    const amount = netValue * 4;
+    const amount = netValue * multiplier;
     setTransferAmount(amount);
 
     setShowPreview(true);
@@ -134,7 +142,7 @@ const TransferLand = () => {
         buyerTeamId: buyerTeam,
         sellerTeamId: sellerTeam,
         landId: land,
-        amount: transferAmount,
+        multiplier,
       };
 
       await axios.post("/transferLand", payload);
@@ -162,8 +170,19 @@ const TransferLand = () => {
         console.error("Failed to fetch teams:", err);
       }
     };
-    
+
+    // Fetch current acquisition multiplier (admin-controlled 3 or 4)
+    const fetchMultiplier = async () => {
+      try {
+        const { data } = await axios.get("/acquisitionMultiplier");
+        setMultiplier(data.value);
+      } catch (err) {
+        console.error("Failed to fetch multiplier:", err);
+      }
+    };
+
     fetchAllTeams();
+    fetchMultiplier();
   }, [roleId, navigate]);
 
   // Re-validate and update preview whenever buyer team changes (if land is already selected)
@@ -171,7 +190,7 @@ const TransferLand = () => {
     if (buyerTeam !== -1 && sellerTeam !== -1 && land !== -1) {
       validateAndCalculate(buyerTeam, sellerTeam, land, landData);
     }
-  }, [buyerTeam]);
+  }, [buyerTeam, multiplier]);
 
   if (filteredBuildings.length === 0) {
     return <Loading />;
@@ -242,6 +261,24 @@ const TransferLand = () => {
           </Select>
         </FormControl>
 
+        {/* Acquisition multiplier selection (3x or 4x of owner's net value) */}
+        <Box sx={{ marginTop: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Typography variant="subtitle2" sx={{ marginBottom: 1 }}>
+            收購倍率 (Acquisition Multiplier)
+          </Typography>
+          <ToggleButtonGroup
+            value={multiplier}
+            exclusive
+            color="primary"
+            onChange={(e, value) => {
+              if (value !== null) setMultiplier(value);
+            }}
+          >
+            <ToggleButton value={3}>3x</ToggleButton>
+            <ToggleButton value={4}>4x</ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+
         {/* Error Message */}
         {error && (
           <Alert severity="error" sx={{ marginTop: 2, width: "100%" }}>
@@ -294,11 +331,11 @@ const TransferLand = () => {
                         ${landData.price.buy + calculateUpgradeCost(landData)}
                       </TableCell>
                     </TableRow>
-                    <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
+                    <TableRow sx={{ backgroundColor: "rgba(215,183,101,0.08)" }}>
                       <TableCell>
-                        <strong>Transfer Amount (4x Net Value):</strong>
+                        <strong>Transfer Amount ({multiplier}x Net Value):</strong>
                       </TableCell>
-                      <TableCell sx={{ fontWeight: "bold", color: "blue" }}>
+                      <TableCell sx={{ fontWeight: "bold", color: "primary.main" }}>
                         ${transferAmount}
                       </TableCell>
                     </TableRow>
@@ -312,7 +349,7 @@ const TransferLand = () => {
                       <TableCell>
                         <strong>Buyer Money After:</strong>
                       </TableCell>
-                      <TableCell sx={{ color: buyerData.money - transferAmount < 0 ? "red" : "green" }}>
+                      <TableCell sx={{ color: buyerData.money - transferAmount < 0 ? "error.main" : "success.main" }}>
                         ${buyerData.money - transferAmount}
                       </TableCell>
                     </TableRow>
@@ -326,7 +363,7 @@ const TransferLand = () => {
                       <TableCell>
                         <strong>Seller Money After:</strong>
                       </TableCell>
-                      <TableCell sx={{ color: "green" }}>
+                      <TableCell sx={{ color: "success.main" }}>
                         ${sellerData.money + transferAmount}
                       </TableCell>
                     </TableRow>

@@ -11,15 +11,15 @@ import Properties from "./components/Properties/Properties";
 import SellProperty from "./components/Properties/SellProperty";
 import Login from "./components/Login";
 import AddMoney from "./components/NPC/AddMoney";
+import BuyProperty from "./components/NPC/BuyProperty";
 import SetOwnership from "./components/NPC/SetOwnership";
-import Transfer from "./components/NPC/Transfer";
+import Toll from "./components/NPC/Toll";
 import TransferLand from "./components/NPC/TransferLand";
 import SetShopLevel from "./components/NPC/SetShopLevel";
 import Support from "./components/NPC/Support";
 import Event from "./components/admin/Event";
 import Resources from "./components/NPC/Resources";
 import Additional from "./components/admin/Additional";
-import SetOccupation from "./components/admin/SetOccupation";
 import Bank from "./components/admin/Bank";
 import Bankrupt from "./components/admin/Bankrupt";
 import PermissionDenied from "./components/PermissionDenied";
@@ -100,8 +100,9 @@ const App = () => {
               <Route path="sellproperty" element={<SellProperty />} />
               <Route path="login" element={<Login />} />
               <Route path="addmoney" element={<AddMoney />} />
+              <Route path="buyproperty" element={<BuyProperty />} />
               <Route path="setownership" element={<SetOwnership />} />
-              <Route path="transfer" element={<Transfer />} />
+              <Route path="toll" element={<Toll />} />
               <Route path="transferland" element={<TransferLand />} />
               <Route path="banktransfer" element={<BankTransfer />} />
               <Route path="setshop" element={<SetShopLevel />} />
@@ -109,7 +110,6 @@ const App = () => {
               <Route path="event" element={<Event />} />
               <Route path="resources" element={<Resources/>} />
               <Route path="additional" element={<Additional />} />
-              <Route path="setoccupation" element={<SetOccupation />} />
               <Route path="permission" element={<PermissionDenied />} />
               <Route path="loading" element={<Loading />} />
               <Route path="interest" element={<Interest />} />

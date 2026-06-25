@@ -33,7 +33,14 @@ const Footer = () => {
   }, [role]);
 
   return (
-    <AppBar position="fixed" sx={{ top: "auto", bottom: 0 }}>
+    <AppBar
+      position="fixed"
+      sx={{
+        top: "auto",
+        bottom: 0,
+        pb: "env(safe-area-inset-bottom, 0px)",
+      }}
+    >
       <BottomNavigation
         showLabels
         value={value}

@@ -26,7 +26,7 @@ import RoleContext from "../useRole";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
 
-const Transfer = () => {
+const Toll = () => {
   const [from, setFrom] = useState(-1);
   const [fromData, setFromData] = useState({});
 
@@ -467,4 +467,4 @@ const Transfer = () => {
     </Container>
   );
 };
-export default Transfer;
+export default Toll;
