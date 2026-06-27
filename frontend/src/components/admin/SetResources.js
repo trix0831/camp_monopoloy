@@ -15,7 +15,6 @@ import {
   MenuItem,
   Typography,
   Box,
-  Button,
   FormControl,
   Grid,
 } from "@mui/material";
@@ -24,6 +23,7 @@ import SendIcon from "@mui/icons-material/Send";
 import RoleContext from "../useRole";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const SetResources = () => {
   let flag = false;
@@ -200,7 +200,7 @@ const SetResources = () => {
               variant="standard"
               sx={{ minWidth: 250, marginTop: 2 }}
             >
-              <Button
+              <MagicButton
                 variant="contained"
                 disabled={team === -1 || number === -1}
                 onClick={handleClick}
@@ -208,7 +208,7 @@ const SetResources = () => {
                 sx={{ marginTop: 2 }}
               >
                 <SendIcon />
-              </Button>
+              </MagicButton>
             </FormControl>
           </Box>
 
@@ -275,7 +275,7 @@ const SetResources = () => {
               variant="standard"
               sx={{ minWidth: 250, marginTop: 2 }}
             >
-              <Button
+              <MagicButton
                 variant="contained"
                 disabled={resourceIdPrice === -1}
                 onClick={updatePrice}
@@ -283,7 +283,7 @@ const SetResources = () => {
                 sx={{ marginTop: 2 }}
               >
                 <SendIcon />
-              </Button>
+              </MagicButton>
             </FormControl>
           </Box>
         </Container>

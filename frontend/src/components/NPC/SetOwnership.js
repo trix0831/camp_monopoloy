@@ -8,7 +8,6 @@ import {
   MenuItem,
   Typography,
   Box,
-  Button,
   FormControl,
   FormHelperText,
   Snackbar,
@@ -21,6 +20,7 @@ import Loading from "../Loading";
 import RoleContext from "../useRole";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const SetOwnership = () => {
   const [team, setTeam] = useState(-1);
@@ -153,10 +153,10 @@ const SetOwnership = () => {
             >
               Submit
             </Button> */}
-            <Button
+            <MagicButton
               variant="contained"
               disabled={
-                team === -1 || 
+                team === -1 ||
                 building === -1
               }
               onClick={handleClick}
@@ -164,7 +164,7 @@ const SetOwnership = () => {
               sx={{ marginTop: 2 }}
             >
               <SendIcon />
-            </Button>
+            </MagicButton>
           </FormControl>
           {!(team === -1 || building === -1) ? (
             <>

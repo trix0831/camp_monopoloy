@@ -15,6 +15,7 @@ import SendIcon from "@mui/icons-material/Send";
 import Loading from "../Loading";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const LoanManagement = () => {
   const { teams, setTeams, roleId, setNavBarId } = useContext(RoleContext);
@@ -247,7 +248,7 @@ const LoanManagement = () => {
                 </Paper>
               )}
 
-              <Button
+              <MagicButton
                 variant="contained"
                 disabled={!showPreview || error}
                 onClick={handleSubmit}
@@ -255,7 +256,7 @@ const LoanManagement = () => {
                 sx={{ marginTop: 3 }}
               >
                 <SendIcon />
-              </Button>
+              </MagicButton>
             </Box>
           </Container>
         ) : (

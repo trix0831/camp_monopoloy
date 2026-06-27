@@ -64,6 +64,31 @@ body {
   to { transform: rotate(360deg); }
 }
 
+/* ── Owl (Hedwig) SVG animations ───────────────────────────────────────────
+   Defined globally so they work in plain inline `style` attributes on SVG
+   elements. (Emotion `keyframes` only inject the @keyframes rule when used
+   through the sx/css prop, NOT from a raw style attribute.) */
+@keyframes wingFlapUp {
+  0%   { transform: rotate(-38deg) scaleY(1)    scaleX(1); }
+  45%  { transform: rotate(34deg)  scaleY(0.5)  scaleX(0.92); }
+  55%  { transform: rotate(38deg)  scaleY(0.45) scaleX(0.9); }
+  100% { transform: rotate(-38deg) scaleY(1)    scaleX(1); }
+}
+@keyframes wingFlapDown {
+  0%   { transform: rotate(38deg)  scaleY(1)    scaleX(1); }
+  45%  { transform: rotate(-34deg) scaleY(0.5)  scaleX(0.92); }
+  55%  { transform: rotate(-38deg) scaleY(0.45) scaleX(0.9); }
+  100% { transform: rotate(38deg)  scaleY(1)    scaleX(1); }
+}
+@keyframes eyeBlink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%           { transform: scaleY(0.08); }
+}
+@keyframes featherShimmer {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
 /* --- Route transition: gentle magical fade + lift --- */
 .fade-enter {
   opacity: 0;
@@ -91,6 +116,12 @@ body {
   .fade-exit.fade-exit-active {
     transition: opacity 120ms linear;
     transform: none;
+  }
+
+  /* Freeze the owl (and all its parts) for motion-sensitive users */
+  .hedwig-owl,
+  .hedwig-owl * {
+    animation: none !important;
   }
 }
 

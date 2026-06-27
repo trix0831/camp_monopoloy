@@ -7,7 +7,6 @@ import {
   MenuItem,
   Typography,
   Box,
-  Button,
   FormControl,
   FormHelperText,
   Snackbar,
@@ -28,6 +27,7 @@ import Loading from "../Loading";
 import RoleContext from "../useRole";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const TransferLand = () => {
   const [buyerTeam, setBuyerTeam] = useState(-1);
@@ -378,7 +378,7 @@ const TransferLand = () => {
             </Box>
 
             {/* Transfer Button */}
-            <Button
+            <MagicButton
               variant="contained"
               color="primary"
               disabled={
@@ -395,7 +395,7 @@ const TransferLand = () => {
               startIcon={<SendIcon />}
             >
               Confirm Transfer
-            </Button>
+            </MagicButton>
           </>
         )}
       </Box>

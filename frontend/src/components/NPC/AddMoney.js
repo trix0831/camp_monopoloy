@@ -13,6 +13,7 @@ import SendIcon from "@mui/icons-material/Send";
 import axios from "../axios";
 import RoleContext from "../useRole";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const AddMoney = () => {
   const [team, setTeam] = useState(-1);
@@ -168,14 +169,14 @@ const AddMoney = () => {
             <SimpleMoneyButton val={+2000} />
           </Box>
 
-          <Button
+          <MagicButton
             variant="contained"
             disabled={team === -1 || amount === "" || teamData.money < 0}
             onClick={handleSubmit}
             fullWidth
           >
             <SendIcon />
-          </Button>
+          </MagicButton>
         </FormControl>
 
         {showPreview && (

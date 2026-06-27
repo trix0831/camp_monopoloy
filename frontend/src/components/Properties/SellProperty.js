@@ -6,7 +6,6 @@ import {
   Select,
   MenuItem,
   Typography,
-  Button,
   Box,
   FormControl,
   Checkbox,
@@ -23,6 +22,7 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import axios from "../axios";
 import RoleContext from "../useRole";
+import MagicButton from "../MagicButton";
 
 const SellProperty = () => {
   const [teamData, setTeamData] = useState({});
@@ -161,7 +161,7 @@ const SellProperty = () => {
                 </Table>
               </TableContainer>
             </RadioGroup>
-            <Button
+            <MagicButton
               variant="contained"
               disabled={building === -1}
               onClick={handleSubmit}
@@ -169,7 +169,7 @@ const SellProperty = () => {
               sx={{ marginTop: 2 }}
             >
               <SendIcon />
-            </Button>
+            </MagicButton>
           </FormControl>
           {building !== -1 ? (
             <>
@@ -226,7 +226,7 @@ const SellProperty = () => {
                 setForced(e.target.checked);
               }}
             />
-            <Button
+            <MagicButton
               variant="contained"
               disabled={building === -1}
               onClick={handleSubmit}
@@ -234,7 +234,7 @@ const SellProperty = () => {
               sx={{ marginTop: 2 }}
             >
               <SendIcon />
-            </Button>
+            </MagicButton>
           </FormControl>
         </Box>
       </Container>

@@ -21,6 +21,7 @@ import SendIcon from "@mui/icons-material/Send";
 import axios from "../axios";
 import Shop2Icon from "@mui/icons-material/Shop2";
 import { useNavigate } from "react-router-dom";
+import MagicButton from "../MagicButton";
 
 const Random = () => {
   const [team, setTeam] = useState(-1);
@@ -183,7 +184,7 @@ const Random = () => {
                     ) : null
                   )}
                 </Select>
-                <Button
+                <MagicButton
                   variant="contained"
                   disabled={mode === -1}
                   onClick={handleAquire}
@@ -191,7 +192,7 @@ const Random = () => {
                   sx={{ marginTop: 2 }}
                 >
                   <Shop2Icon />
-                </Button>
+                </MagicButton>
               </FormControl>
             </>
           ) : (
@@ -252,7 +253,7 @@ const Random = () => {
                     ) : null
                   )}
                 </Select>
-                <Button
+                <MagicButton
                   variant="contained"
                   disabled={mode === -1}
                   onClick={handleExchange}
@@ -260,7 +261,7 @@ const Random = () => {
                   sx={{ marginTop: 2 }}
                 >
                   <PublishedWithChangesIcon sx={{ margin: 1 }} />
-                </Button>
+                </MagicButton>
               </FormControl>
             </>
           )}

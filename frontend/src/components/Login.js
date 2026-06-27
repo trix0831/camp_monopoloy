@@ -5,7 +5,6 @@ import {
   TextField,
   Typography,
   Box,
-  Button,
   FormControl,
   Snackbar,
   Alert,
@@ -13,6 +12,7 @@ import {
 import RoleContext from "./useRole";
 // import { socket } from "../websocket";
 import axios from "./axios";
+import MagicButton from "./MagicButton";
 
 export const roleIdMap = {
   "1A": 1,
@@ -113,13 +113,13 @@ const Login = () => {
               setPassword(e.target.value);
             }}
           />
-          <Button
+          <MagicButton
             sx={{ marginTop: 1 }}
             disabled={!(user && password)}
             onClick={handleClick}
           >
             Login
-          </Button>
+          </MagicButton>
         </FormControl>
       </Box>
       <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>

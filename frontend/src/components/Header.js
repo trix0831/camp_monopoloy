@@ -24,27 +24,9 @@ const bodyFloat = keyframes`
   70%       { transform: translateY(3px)  rotate(-0.5deg); }
 `;
 
-const wingFlapUp = keyframes`
-  0%   { transform: rotate(-30deg) scaleY(1); }
-  50%  { transform: rotate(20deg)  scaleY(0.55); }
-  100% { transform: rotate(-30deg) scaleY(1); }
-`;
-
-const wingFlapDown = keyframes`
-  0%   { transform: rotate(30deg)  scaleY(1); }
-  50%  { transform: rotate(-20deg) scaleY(0.55); }
-  100% { transform: rotate(30deg)  scaleY(1); }
-`;
-
-const eyeBlink = keyframes`
-  0%, 92%, 100% { transform: scaleY(1); }
-  95%           { transform: scaleY(0.08); }
-`;
-
-const featherShimmer = keyframes`
-  0%, 100% { opacity: 0.55; }
-  50%       { opacity: 1; }
-`;
+// NOTE: wingFlapUp / wingFlapDown / eyeBlink / featherShimmer are defined as
+// real @keyframes in App.css, because they are applied through plain inline
+// `style` attributes on SVG elements where Emotion keyframes won't inject.
 
 const sparkFloat = keyframes`
   0%   { opacity: 0;   transform: translate(0, 0)    scale(0.4); }
@@ -102,6 +84,7 @@ const Spark = ({ sx, sy, sx2, sy2, delay, dur }) => (
 
 const Hedwig = ({ onClick }) => (
   <Box
+    className="hedwig-owl"
     onClick={onClick}
     onKeyDown={(e) => e.key === "Enter" && onClick()}
     role="button"
@@ -151,8 +134,9 @@ const Hedwig = ({ onClick }) => (
       >
         {/* ── Left wing ── */}
         <g style={{
-          transformOrigin: "28px 26px",
-          animation: `${wingFlapUp} 0.9s ease-in-out infinite`,
+          transformBox: "view-box",
+          transformOrigin: "26px 25px",
+          animation: "wingFlapUp 1.5s ease-in-out infinite",
         }}>
           {/* Outer primary feathers */}
           <ellipse cx="11" cy="30" rx="12" ry="5" fill="rgba(245,240,225,0.75)"
@@ -167,14 +151,15 @@ const Hedwig = ({ onClick }) => (
           <ellipse cx="18" cy="24" rx="13" ry="7"
             fill="rgba(255,248,220,0.22)"
             transform="rotate(-18 18 24)"
-            style={{ animation: `${featherShimmer} 2.4s ease-in-out infinite` }}
+            style={{ animation: "featherShimmer 2.4s ease-in-out infinite" }}
           />
         </g>
 
         {/* ── Right wing ── */}
         <g style={{
-          transformOrigin: "34px 26px",
-          animation: `${wingFlapDown} 0.9s ease-in-out infinite`,
+          transformBox: "view-box",
+          transformOrigin: "36px 25px",
+          animation: "wingFlapDown 1.5s ease-in-out infinite",
         }}>
           <ellipse cx="51" cy="30" rx="12" ry="5" fill="rgba(245,240,225,0.75)"
             transform="rotate(28 51 30)" />
@@ -185,7 +170,7 @@ const Hedwig = ({ onClick }) => (
           <ellipse cx="44" cy="24" rx="13" ry="7"
             fill="rgba(255,248,220,0.22)"
             transform="rotate(18 44 24)"
-            style={{ animation: `${featherShimmer} 2.4s ease-in-out infinite`, animationDelay: "0.4s" }}
+            style={{ animation: "featherShimmer 2.4s ease-in-out infinite", animationDelay: "0.4s" }}
           />
         </g>
 
@@ -217,7 +202,11 @@ const Hedwig = ({ onClick }) => (
         <circle cx="26" cy="22" r="4" fill="#1A1206" />
         <circle cx="26" cy="22" r="3.2"
           fill="#E8A020"
-          style={{ animation: `${eyeBlink} 5s ease-in-out infinite` }}
+          style={{
+            transformBox: "fill-box",
+            transformOrigin: "center",
+            animation: "eyeBlink 5s ease-in-out infinite",
+          }}
         />
         <circle cx="26" cy="22" r="1.8" fill="#0A0804" />
         <circle cx="27.2" cy="20.8" r="0.9" fill="rgba(255,255,255,0.85)" />
@@ -228,7 +217,12 @@ const Hedwig = ({ onClick }) => (
         <circle cx="36" cy="22" r="4" fill="#1A1206" />
         <circle cx="36" cy="22" r="3.2"
           fill="#E8A020"
-          style={{ animation: `${eyeBlink} 5s ease-in-out infinite`, animationDelay: "0.1s" }}
+          style={{
+            transformBox: "fill-box",
+            transformOrigin: "center",
+            animation: "eyeBlink 5s ease-in-out infinite",
+            animationDelay: "0.1s",
+          }}
         />
         <circle cx="36" cy="22" r="1.8" fill="#0A0804" />
         <circle cx="37.2" cy="20.8" r="0.9" fill="rgba(255,255,255,0.85)" />
@@ -367,6 +361,15 @@ const Header = () => {
                 backgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 animation: `${shimmerText} 5s linear infinite`,
+                // Dark-only engraved bevel: adds carved 3D depth BEHIND the
+                // letters without any gold glow, so the bright shimmer-sweep
+                // glow stays fully visible on top.
+                textShadow: [
+                  "0 -1px 0 rgba(255,250,235,0.45)", // top highlight lip
+                  "0 1px 0 #7A5A18", // bevel side
+                  "0 2px 0 #5E4512", // bevel side
+                  "0 3px 2px rgba(0,0,0,0.5)", // contact shadow
+                ].join(", "),
                 filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.7))",
               }}
             >

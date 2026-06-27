@@ -7,12 +7,12 @@ import {
   InputLabel,
   Typography,
   Box,
-  Button,
   FormControl,
 } from "@mui/material";
 import RoleContext from "../useRole";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const SetShopLevel = () => {
   const [team, setTeam] = useState(-1);
@@ -95,9 +95,9 @@ const SetShopLevel = () => {
         </FormControl>
 
         <FormControl variant="standard" sx={{ minWidth: 250, marginTop: 2 }}>
-          <Button disabled={team === "Select Team"} onClick={handleClick}>
+          <MagicButton disabled={team === "Select Team"} onClick={handleClick}>
             Submit
-          </Button>
+          </MagicButton>
         </FormControl>
         {showPreview && (
           <Box

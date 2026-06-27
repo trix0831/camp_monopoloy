@@ -8,7 +8,6 @@ import {
   TextField,
   Typography,
   Box,
-  Button,
   FormControl,
   Dialog,
   DialogTitle,
@@ -17,6 +16,7 @@ import {
 import RoleContext from "../useRole";
 import Loading from "../Loading";
 import axios from "../axios";
+import MagicButton from "../MagicButton";
 
 const Additional = () => {
   const [event, setEvent] = useState(0);
@@ -166,12 +166,12 @@ const Additional = () => {
                 setMessage(e.target.value);
               }}
             />
-            <Button
+            <MagicButton
               disabled={!(message && team !== "Select Team")}
               onClick={handleClick}
             >
               Submit
-            </Button>
+            </MagicButton>
           </FormControl>
           <Dialog open={open} onClose={() => setOpen(false)}>
             <DialogTitle>Notification</DialogTitle>

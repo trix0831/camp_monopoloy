@@ -4,7 +4,6 @@ import {
   Box,
   Paper,
   Typography,
-  Button,
   FormControl,
   InputLabel,
   Select,
@@ -22,6 +21,7 @@ import TeamSelect from "../TeamSelect";
 import Loading from "../Loading";
 import axios from "../axios";
 import { useNavigate } from "react-router-dom";
+import MagicButton from "../MagicButton";
 
 const Bankrupt = () => {
   const [team, setTeam] = useState(-1);
@@ -171,14 +171,14 @@ const Bankrupt = () => {
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                 Properties Owned
               </Typography>
-              <Button
+              <MagicButton
                 variant="contained"
                 color="error"
                 disabled={selected.length === 0}
                 onClick={handleSoldOut}
               >
                 Sell Selected ({selected.length})
-              </Button>
+              </MagicButton>
             </Box>
 
             {loading ? (

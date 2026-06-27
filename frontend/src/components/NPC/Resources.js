@@ -23,6 +23,7 @@ import SendIcon from "@mui/icons-material/Send";
 import RoleContext from "../useRole";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const Resources = () => {
   let flag = false;
@@ -241,7 +242,7 @@ const Resources = () => {
                 variant="standard"
                 sx={{ minWidth: 250, marginTop: 2 }}
               >
-                <Button
+                <MagicButton
                   variant="contained"
                   disabled={team === -1 || number === -1}
                   onClick={handleClick}
@@ -249,7 +250,7 @@ const Resources = () => {
                   sx={{ marginTop: 2 }}
                 >
                   <SendIcon/>
-                </Button>
+                </MagicButton>
               </FormControl>
             </Box>
           </Container>
@@ -344,7 +345,7 @@ const Resources = () => {
               variant="standard"
               sx={{ minWidth: 250, marginTop: 2 }}
             >
-              <Button
+              <MagicButton
                 variant="contained"
                 disabled={team === -1 || number === -1}
                 onClick={handleControlClick}
@@ -352,7 +353,7 @@ const Resources = () => {
                 sx={{ marginTop: 2 }}
               >
                 <SendIcon />
-              </Button>
+              </MagicButton>
             </FormControl>
           </Box>
 

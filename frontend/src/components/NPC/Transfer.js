@@ -9,7 +9,6 @@ import {
   TextField,
   Typography,
   Box,
-  Button,
   FormControl,
   TableContainer,
   TableBody,
@@ -25,6 +24,7 @@ import PropertyCard from "../Properties/PropertyCard";
 import RoleContext from "../useRole";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const Transfer = () => {
   const [from, setFrom] = useState(-1);
@@ -451,7 +451,7 @@ const Transfer = () => {
             love discount
           </Button> */}
 
-          <Button
+          <MagicButton
             variant="contained"
             disabled={!(from && to && amount) || from === to || fromData.money < 0}
             onClick={handleClick}
@@ -459,7 +459,7 @@ const Transfer = () => {
             sx={{ marginTop: 1 }}
           >
             <SendIcon />
-          </Button>
+          </MagicButton>
         </FormControl>
         {building !== -1 ? <PreviewBuilding /> : null}
         {from !== -1 && to !== -1 ? <PreviewTransfer /> : null}

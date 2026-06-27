@@ -23,6 +23,7 @@ import FunctionsIcon from "@mui/icons-material/Functions";
 import Loading from "../Loading";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const Bank = () => {
   const { teams, setTeams } = useContext(RoleContext);
@@ -202,14 +203,14 @@ const Bank = () => {
                       flexDirection="row"
                       justifyContent="center"
                     >
-                      <Button
+                      <MagicButton
                         variant="contained"
                         disabled={team === -1 || amount === ""}
                         onClick={handleSubmit}
                         fullWidth
                       >
                         <SendIcon />
-                      </Button>
+                      </MagicButton>
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
@@ -218,13 +219,13 @@ const Bank = () => {
                       flexDirection="row"
                       justifyContent="center"
                     >
-                      <Button
+                      <MagicButton
                         variant="contained"
                         onClick={handleAccounting}
                         fullWidth
                       >
                         <FunctionsIcon />
-                      </Button>
+                      </MagicButton>
                     </Box>
                   </Grid>
                 </Grid>

@@ -21,6 +21,7 @@ import {
 import Loading from "../Loading";
 import RoleContext from "../useRole";
 import axios from "../axios";
+import MagicButton from "../MagicButton";
 
 const Event = () => {
   const [event, setEvent] = useState(0);
@@ -160,14 +161,14 @@ const Event = () => {
             <Button onClick={() => { setOpenDialog(false); setResetInput(""); }} color="primary">
               Cancel
             </Button>
-            <Button
+            <MagicButton
               onClick={handleReset}
               color="error"
               variant="contained"
               disabled={resetInput !== "reset"}
             >
               Confirm
-            </Button>
+            </MagicButton>
           </DialogActions>
         </Dialog>
       </Container>

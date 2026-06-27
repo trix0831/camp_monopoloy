@@ -7,7 +7,6 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Button,
   Snackbar,
   Alert,
 } from "@mui/material";
@@ -15,6 +14,7 @@ import RoleContext from "../useRole";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "../axios";
 import { useNavigate } from "react-router-dom";
+import MagicButton from "../MagicButton";
 
 const Support = () => {
   const { buildings } = useContext(RoleContext);
@@ -69,7 +69,7 @@ const Support = () => {
               </MenuItem>
             ))}
           </Select>
-          <Button
+          <MagicButton
             variant="contained"
             disabled={building === -1}
             onClick={handleClick}
@@ -77,7 +77,7 @@ const Support = () => {
             sx={{ marginTop: 2 }}
           >
             <SendIcon />
-          </Button>
+          </MagicButton>
         </FormControl>
       </Box>
       <Snackbar

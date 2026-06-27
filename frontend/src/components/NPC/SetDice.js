@@ -16,6 +16,7 @@ import TeamSelect from "../TeamSelect";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import axios from "../axios";
 import { useNavigate } from "react-router-dom";
+import MagicButton from "../MagicButton";
 
 const SetDice = () => {
   const [team, setTeam] = useState(-1);
@@ -53,7 +54,7 @@ const SetDice = () => {
             handleTeam={handleTeam}
             hasZero={true}
           />
-          <Button
+          <MagicButton
             variant="contained"
             disabled={team === -1}
             onClick={handleClick}
@@ -61,7 +62,7 @@ const SetDice = () => {
             sx={{ marginTop: 2 }}
           >
             <ConstructionIcon />
-          </Button>
+          </MagicButton>
         </FormControl>
       </Box>
       <Snackbar

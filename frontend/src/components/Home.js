@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container, Box, Typography } from "@mui/material";
 import { motion, useReducedMotion } from "framer-motion";
+import HogwartsGatesIntro from "./HogwartsGatesIntro";
 
 // --- Animation Variants ---------------------------------------------------
 
@@ -64,9 +65,14 @@ const Ember = ({ left, delay, duration, size }) => (
 const Home = () => {
   const title = "MONOPOLY";
   const prefersReduced = useReducedMotion();
+  // Plays the Hogwarts-gates intro on every home visit.
+  const [showIntro, setShowIntro] = useState(true);
 
   return (
     <Container component="main" maxWidth="sm">
+      {showIntro && (
+        <HogwartsGatesIntro onFinish={() => setShowIntro(false)} />
+      )}
       <Box
         sx={{
           position: "relative",

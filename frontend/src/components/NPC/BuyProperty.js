@@ -7,7 +7,6 @@ import {
   MenuItem,
   Typography,
   Box,
-  Button,
   FormControl,
   TableContainer,
   TableRow,
@@ -23,6 +22,7 @@ import AddIcon from "@mui/icons-material/Add";
 import axios from "../axios";
 import RoleContext from "../useRole";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const BuyProperty = () => {
   const [team, setTeam] = useState(-1);
@@ -257,7 +257,7 @@ const BuyProperty = () => {
             </Box>
           )}
 
-          <Button
+          <MagicButton
             variant="contained"
             sx={{ mt: 2, minWidth: 250 }}
             disabled={
@@ -274,7 +274,7 @@ const BuyProperty = () => {
             <SendIcon />
             <AddIcon />
             <RequestQuoteIcon />
-          </Button>
+          </MagicButton>
         </Box>
       </Box>
     </Container>

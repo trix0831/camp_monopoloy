@@ -9,7 +9,6 @@ import {
   TextField,
   Typography,
   Box,
-  Button,
   FormControl,
   TableContainer,
   TableBody,
@@ -24,6 +23,7 @@ import PropertyCard from "../Properties/PropertyCard";
 import RoleContext from "../useRole";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const Interest = () => {
   const [rate, setRate] = useState(0);
@@ -106,7 +106,7 @@ const Interest = () => {
           >
           </Box>
 
-          <Button
+          <MagicButton
             variant="contained"
             disabled={rate === 0}
             onClick={handleClick}
@@ -114,7 +114,7 @@ const Interest = () => {
             sx={{ marginTop: 1 }}
           >
             <SendIcon />
-          </Button>
+          </MagicButton>
         </FormControl>
       </Box>
     </Container>

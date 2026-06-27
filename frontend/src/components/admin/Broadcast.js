@@ -8,13 +8,13 @@ import {
   // InputLabel,
   Typography,
   Box,
-  Button,
   FormControl,
   // Alert,
 } from "@mui/material";
 // import Loading from "../Loading";
 import RoleContext from "../useRole";
 import axios from "../axios";
+import MagicButton from "../MagicButton";
 
 const Broadcast = () => {
   const [title, setTitle] = useState("");
@@ -89,9 +89,9 @@ const Broadcast = () => {
             <MenuItem value={10}>NPC</MenuItem>
             <MenuItem value={100}>Admin</MenuItem>
           </Select>
-          <Button disabled={!title || !description} onClick={handleClick}>
+          <MagicButton disabled={!title || !description} onClick={handleClick}>
             Submit
-          </Button>
+          </MagicButton>
         </FormControl>
       </Box>
     </Container>

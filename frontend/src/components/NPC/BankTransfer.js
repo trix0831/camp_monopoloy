@@ -9,7 +9,6 @@ import {
   TextField,
   Typography,
   Box,
-  Button,
   FormControl,
   TableContainer,
   TableBody,
@@ -25,6 +24,7 @@ import PropertyCard from "../Properties/PropertyCard";
 import RoleContext from "../useRole";
 import axios from "../axios";
 import TeamSelect from "../TeamSelect";
+import MagicButton from "../MagicButton";
 
 const BankTransfer = () => {
   const [targetTeam, setTargetTeam] = useState(-1);
@@ -210,7 +210,7 @@ const BankTransfer = () => {
           >
           </Box>
 
-          <Button
+          <MagicButton
             variant="contained"
             disabled={amount === 0 || targetTeam === -1}
             onClick={handleClick}
@@ -218,7 +218,7 @@ const BankTransfer = () => {
             sx={{ marginTop: 1 }}
           >
             <SendIcon />
-          </Button>
+          </MagicButton>
         </FormControl>
 
         {targetTeam !== -1  ? <PreviewTransfer /> : null}
@@ -275,14 +275,14 @@ const BankTransfer = () => {
             />
 
             <Box display="flex" flexDirection="row" justifyContent="center">
-              <Button
+              <MagicButton
                 variant="contained"
                 disabled={targetBankTeam === -1 || bankAmount === ""}
                 onClick={handleBankClick}
                 fullWidth
               >
                 <SendIcon />
-              </Button>
+              </MagicButton>
             </Box>
           </FormControl>
         </Box>
