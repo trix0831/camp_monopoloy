@@ -65,11 +65,12 @@ const AddMoney = () => {
     setNavBarId(2);
   };
 
-  const SimpleMoneyButton = ({ val }) => (
+  const SimpleMoneyButton = ({ val, fullWidth }) => (
     <Button
       variant="contained"
       disabled={team === -1}
-      sx={{ marginBottom: 1, width: 80 }}
+      fullWidth={fullWidth}
+      sx={{ marginBottom: 1, width: fullWidth ? undefined : 80 }}
       onClick={() => {
         const currentVal = parseInt(amount) || 0;
         handleAmount((currentVal + val).toString());
@@ -153,9 +154,9 @@ const AddMoney = () => {
               justifyContent: "space-between",
             }}
           >
-            <SimpleMoneyButton val={-200} />
-            <SimpleMoneyButton val={-400} />
+            <SimpleMoneyButton val={-300} />
             <SimpleMoneyButton val={-500} />
+            <SimpleMoneyButton val={-800} />
           </Box>
           <Box
             sx={{
@@ -164,10 +165,11 @@ const AddMoney = () => {
               justifyContent: "space-between",
             }}
           >
-            <SimpleMoneyButton val={+200} />
-            <SimpleMoneyButton val={+400} />
-            <SimpleMoneyButton val={+2000} />
+            <SimpleMoneyButton val={+300} />
+            <SimpleMoneyButton val={+500} />
+            <SimpleMoneyButton val={+800} />
           </Box>
+          <SimpleMoneyButton val={+2000} fullWidth />
 
           <MagicButton
             variant="contained"

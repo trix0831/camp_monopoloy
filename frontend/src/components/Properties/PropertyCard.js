@@ -247,7 +247,7 @@ const PropertyCard = forwardRef((props, ref) => {
                 sx={{ fontWeight: 700, fontSize: "0.9rem" }}
                 component="h5"
               >
-                {`購買資金：初級 ${rent[0]} 中級 ${rent[1]} 高級 ${rent[2]} 頂級 ${rent[3]} `}
+                {`過路費：初級 ${rent[0]} 中級 ${rent[1]} 高級 ${rent[2]} 頂級 ${rent[3]} `}
               </Typography>
             )}
           </Box>

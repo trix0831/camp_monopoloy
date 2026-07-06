@@ -36,11 +36,16 @@ const port = PORT || 4000;
 mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+}).catch((err) => {
+  // Fail fast with a clear message instead of hanging until Cloud Run's
+  // startup probe times out (4 min) on an unhandled rejection.
+  console.error("Failed to connect to MongoDB:", err.message);
+  process.exit(1);
 });
 
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
-  console.log("MongoDB connected");
+  console.log(`MongoDB connected: ${db.host}`);
 
   const app = express();
 

@@ -49,7 +49,7 @@ const BuyProperty = () => {
         } else if (landData.owner === selectedTeam) {
           if (landData.type === "Game") {
             setAmount("0");
-          } else if (landData.level < price.upgrade.length) {
+          } else if (landData.level <= price.upgrade.length) {
             setAmount((price.upgrade[landData.level - 1] * -1).toString());
           } else {
             setAmount("0");
@@ -86,7 +86,7 @@ const BuyProperty = () => {
       } else if (data.owner === team) {
         if (data.type === "Game") {
           setAmount("0");
-        } else if (data.level < currentPrice.upgrade.length) {
+        } else if (data.level <= currentPrice.upgrade.length) {
           setAmount((currentPrice.upgrade[data.level - 1] * -1).toString());
         } else {
           setAmount("0");

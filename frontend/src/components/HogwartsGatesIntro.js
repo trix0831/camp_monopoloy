@@ -252,7 +252,7 @@ const Dust = ({ left, delay, dur, size }) => (
   />
 );
 
-const HogwartsGatesIntro = ({ onFinish }) => {
+const HogwartsGatesIntro = ({ onFinish, onGatesOpen }) => {
   const reduced = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -272,7 +272,10 @@ const HogwartsGatesIntro = ({ onFinish }) => {
       const t = setTimeout(finish, 500);
       return () => clearTimeout(t);
     }
-    const t1 = setTimeout(() => setOpen(true), T_OPEN);
+    const t1 = setTimeout(() => {
+      setOpen(true);
+      onGatesOpen && onGatesOpen(); // release the baby into the light
+    }, T_OPEN);
     const t2 = setTimeout(() => setVisible(false), T_FADE);
     const t3 = setTimeout(() => {
       setFinished(true);

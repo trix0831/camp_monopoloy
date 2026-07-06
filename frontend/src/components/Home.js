@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Container, Box, Typography } from "@mui/material";
 import { motion, useReducedMotion } from "framer-motion";
 import HogwartsGatesIntro from "./HogwartsGatesIntro";
+import FlyingBaby from "./FlyingBaby";
 
 // --- Animation Variants ---------------------------------------------------
 
@@ -67,12 +68,21 @@ const Home = () => {
   const prefersReduced = useReducedMotion();
   // Plays the Hogwarts-gates intro on every home visit.
   const [showIntro, setShowIntro] = useState(true);
+  // The baby takes flight the instant the gates open (out of the light).
+  const [gatesOpen, setGatesOpen] = useState(false);
 
   return (
     <Container component="main" maxWidth="sm">
       {showIntro && (
-        <HogwartsGatesIntro onFinish={() => setShowIntro(false)} />
+        <HogwartsGatesIntro
+          onGatesOpen={() => setGatesOpen(true)}
+          onFinish={() => setShowIntro(false)}
+        />
       )}
+
+      {/* Flying wizard baby — soars out of the gate-light, then roams wide.
+          Fixed full-screen layer (above the intro) so nothing clips her. */}
+      {(gatesOpen || !showIntro) && <FlyingBaby />}
       <Box
         sx={{
           position: "relative",
